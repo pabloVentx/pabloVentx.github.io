@@ -2,7 +2,7 @@
 layout: single
 title: Dance Samba - Dockerlabs
 excerpt: "Esta máquina tendrá de objetivo de descubrir unas credenciales a nivel local mediante una nota cual nos dará acceso a un share."
-date: 2025-10-01
+date: 2025-10-29
 classes: wide
 header:
   teaser: /assets/images/dkl-writeup-dancesamba/logo_dancesamba.png

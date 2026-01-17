@@ -14,8 +14,8 @@ categories:
   - Eternalblue
   - eJPTv2
 tags:
-  - eJPTv2
   - writeup
+  - eJPTv2
   - smb
   - EternalBlue
   - CVE-MS17-010
