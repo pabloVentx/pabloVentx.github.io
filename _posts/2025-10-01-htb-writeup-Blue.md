@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Blue - Hack The Box
-excerpt: "Aprenderemos sobre que es y como explotar la vulnerabilidad **Eternal Blue** para ganar una RCE privilegiada sin tener credenciales. Conoceremos el CVE-MS17-010, cual explota gracias a la versión de SMBv1."
+excerpt: "Aprenderemos sobre que es y como explotar la vulnerabilidad: **Eternal Blue**. Ganaremos una shell con RCE privilegiada sin tener credenciales. Conoceremos el CVE-MS17-010, cual explota gracias a la versión de SMBv1."
 date: 2025-10-01
 classes: wide
 header:
@@ -12,9 +12,9 @@ categories:
   - Hackthebox
   - Pentesting
   - Eternalblue
-  - eJTPv2
+  - eJPTv2
 tags:
-  - eJTPv2
+  - eJPTv2
   - writeup
   - smb
   - EternalBlue
@@ -26,14 +26,10 @@ tags:
 
 ![](/assets/images/htb-writeup-blue/logo_blue.png)
 
-"Aprenderemos sobre que es y como explotar la vulnerabilidad **Eternal Blue** para ganar una RCE privilegiada sin tener credenciales. Conoceremos el CVE-MS17-010, cual explota gracias a la versión de SMBv1."
+"Aprenderemos sobre que es y como explotar la vulnerabilidad muy conocida: **Eternal Blue**. Ganaremos una shell con RCE privilegiada sin tener credenciales. Conoceremos el CVE-MS17-010, cual explota gracias a la versión de SMBv1."
 
 ## WRITE UP
-Ejemplo: 10.10.10.40 (víctima) TTL= 127 LINUX
-
-### INTRODUCCIÓN
-
-Aprenderemos sobre que es y como explotar la vulnerabilidad **Eternal Blue** para ganar una RCE privilegiada sin tener credenciales.
+IP VÍCTIMA-> 10.10.10.40 (víctima) TTL= 127 LINUX
 
 
 #### RECONOCIMIENTO

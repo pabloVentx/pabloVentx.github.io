@@ -17,8 +17,8 @@ tags:
   - eJPTv2
   - SSHclaves
   - hash
-  - Sudo
   - EscaladaPrivilegios
+  - Sudo
 ---
 
 ![](/assets/images/dkl-writeup-dancesamba/logo_dancesamba.png)
@@ -28,17 +28,6 @@ Finalmente obteniendo la <span style="color:orange">flag de root</span> en su ho
 
 ## WRITE UP
 IP VÍCITMA-> 172.17.0.2 (TTL 64) LINUX
-
-### INTRODUCCIÓN
-
-Esta máquina tendrá de objetivo de descubrir unas credenciales a nivel dominio mediante una nota cual nos dará acceso a un share.
-
-En dicho share que es el home del usuario, estará la <span style="color:orange">flag del usuario</span>, e tendremos que subir nuestra llave publica para luego loguearnos en **ssh** usando la privada y no nos pedirá contraseña.
-
-Después, encontraremos un usuario secreto cual contiene un hash y lo descifraremos obteniendo la contraseña para el usuario inicial de ssh cual nos va a permitir listar nuestros permisos de sudo.
-
-Podremos leer archivos arbitrarios leyendo uno que contiene la contraseña de root.
-Finalmente obteniendo la <span style="color:orange">flag de root</span> en su home.
 
 
 #### RECONOCIMIENTO
@@ -285,7 +274,7 @@ Si investigamos en el <span style="color:lightblue">/home</span> listando los de
 
 ``MMZVM522LBFHUWSXJYYWG3KW05MVQTT2MQZDS6K2IE6T2==
 
-Usaremos la siguiente página para descifrarlo: https://gchq.github.io/CyberChef/
+Usaremos la siguiente página para descifrarlo: [CyberChef](https://gchq.github.io/CyberChef/)
 
 Dentro pondremos primero de <span style="color:cyan">Base32</span> y que lo pase por último por un <span style="color:cyan">Base64</span>.
 La salida: <span style="color:darkred">supersecurepassword</span>
