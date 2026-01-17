@@ -198,7 +198,7 @@ Para está maquina, ganaremos una ejecución por comandos mediante el ataque *Sh
 En Google nos cuenta que nos permite una **RCE** mediante una inyección maliciosa de los **Headers request**.
 
 
-![](/assets/images/htb-writeup-shocker/identshock_shocker.png*
+![](/assets/images/htb-writeup-shocker/identshock_shocker.png)
 
 
 Para saber si es vulnerable a una **shellshock** usaremos un script de *nmap*:
