@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Ejotapete - Dockerlabs
-excerpt: "Esta máquina tendrá de objetivo de descubrir unas credenciales a nivel local mediante una nota cual nos dará acceso a un share."
+excerpt: "Se enumera la web sin hallar pistas claras, y se explota el servicio drupal v8 con Metasploit para obtener una reverse shell, se accede a un usuario con credenciales encontradas en la basededatos y, abusando de permisos sudo con grep, se lee un archivo que revela la contraseña de root."
 date: 2025-10-07
 classes: wide
 header:
@@ -27,9 +27,11 @@ tags:
 
 ![](/assets/images/dkl-writeup-ejotapete/logo_ejpt.png)
 
-"Enumeraremos directorios a nivel web para descubrir alguna pista. En este caso no encontramos algo, aunque si hay algún archivo que te dice la versión, pero vamos hacerlo al estilo eJPTv2 (faltaba enumerar más y con otras herramientas). Con *Metasploit* ejecutaremos un exploit cual nos dará acceso a comandos y de ahí nos daremos una reverse Shell. Con un permiso de SUDO podríamos ser root. Pero solo nos cambia el  uid entonces podremos ver el directorio root pero no podremos hacer nada más. En el directorio de root hay un .txt
+"Enumeraremos directorios a nivel web para descubrir alguna pista. En este caso no encontramos algo, aunque si hay algún archivo que te dice la versión, pero vamos hacerlo al estilo eJPTv2 (faltaba enumerar más y con otras herramientas).
+Con *Metasploit* ejecutaremos un exploit sobre el servicio drupal v8, cual nos dará acceso a comandos y de ahí nos daremos una reverse Shell.
+Con un permiso de SUDO podríamos ser root. Pero solo nos cambia el  uid entonces podremos ver el directorio root pero no podremos hacer nada más. En el directorio de root hay un .txt
 Investigando entre los archivos de la página veremos unas credenciales cual corresponderán al usuario de la máquina.
-Si listamos sus permisos de sudo tendremos la posibilidad de leer archivos arbitrarios con grep. Leeremos dicho fichero .txt y nos dará la contraseña de root."
+Si listamos sus permisos de sudo tendremos la posibilidad de leer archivos arbitrarios con grep. Leeremos dicho archivo y nos dará la contraseña de root."
 
 ## WRITE UP
 IP VÍCITMA-> 172.17.0.2 (TTL 64) LINUX
