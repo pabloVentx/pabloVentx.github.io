@@ -29,7 +29,7 @@ tags:
 "En este challenge dispondremos de una simple página web con una posible subida de archivos de solamente formato <span style="color:grey">.png</span> . Que cambiando los primeros bytes del archivo cual contendrá el código malicio será posible su subida, aunque tenga un <span style="color:grey">.php</span> (debe tener el <span style="color:grey">.png</span> antes de este) y asi, coger la bandera mediante una ejecución remota de comandos **RCE** via <span style="color:lime">webshell</span>."
 
 ## WRITE UP
-Ejemplo: atlas:picoctf.net:58900 (víctima) TTL=  63 LINUX
+IP VÍCITMA: atlas:picoctf.net:58900 (víctima) TTL=  63 LINUX
 
 
 #### ÁNALISIS WEB: RECONOCIMIENTO

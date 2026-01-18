@@ -31,7 +31,7 @@ Dentro veremos una subida de archivos en formato .wav . Quiere decir que tendrem
 Esto es para obtener una Shell de Windows como autoridad del sistema y coger las banderas."
 
 ## WRITE UP
-Ejemplo: 10.10.10.95 (víctima) TTL= 127 WINDOWS
+IP VÍCTIMA: 10.10.10.95 (víctima) TTL= 127 WINDOWS
 
 
 #### RECONOCIMIENTO
