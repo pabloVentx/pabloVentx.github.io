@@ -1,7 +1,7 @@
 ---
 layout: single
 title: File Upload Validation ByPass
-excerpt: "En este Post, mostrare una serie de métodos para ByPassear la Validación una subida de archivos cual solo permite cierta extensión o otros factores, llegando en algunos casos, a una ejecución remota de comandos (RCE). A medida que vaya aprendiendo más, lo ire actualizando."
+excerpt: "En este Post, mostrare una serie de métodos para ByPassear la Validación de una subida de archivos cual solo permite cierta extensión o otros factores, llegando en algunos casos, a una ejecución remota de comandos (RCE)."
 date: 2026-01-18
 classes: wide
 header:

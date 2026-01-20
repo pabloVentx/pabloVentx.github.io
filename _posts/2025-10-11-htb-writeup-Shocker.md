@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Shocker - Hack The Box
-excerpt: "Descubrimos /cgi-bin/ mediante fuzzing y explotamos Shellshock (vulnerabilidad en Bash) enviando un encabezado malicioso para conseguir RCE y una reverse shell. Luego escalamos privilegios abusando de un permiso de sudo que nos permite ejecutar un binario/comando con privilegios elevados."
+excerpt: "Descubrimos /cgi-bin/ mediante fuzzing y explotamos Shellshock (vulnerabilidad en Bash) enviando un encabezado malicioso para conseguir RCE y una reverse shell. Luego escalamos privilegios abusando de un permiso de sudo que nos permite ejecutar un binario con permisos privilegios cual nos hara root."
 date: 2025-10-11
 classes: wide
 header:
@@ -31,7 +31,7 @@ tags:
 ![](/assets/images/htb-writeup-shocker/logo_shocker.png)
 
 "Mediante Fuzzing a directorios web, hemos descubierto un directorio <span style="color:lightblue">/cgi-bin/</span> cual al almacenar scripts podremos abusar de uno cual nos va a permitir usar mediante un encabezado de solicitud usar una *Shellshosck* y tener una **RCE** y darnos una revershell.
-Para escalar privilegios explotaremos unos privilegios que tendremos con *sudo*."
+Para escalar privilegios explotaremos un permisos de sudo sencillo y nos haremos root."
 
 ## WRITE UP
 IP VÍCTIMA: 10.10.10.56 (víctima) TTL= 63 LINUX
