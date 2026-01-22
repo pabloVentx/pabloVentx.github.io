@@ -5,14 +5,14 @@ excerpt: "En este challenge explotaremos la vulnerabilidad *SSTI* (Server Side T
 date: 2026-01-21
 classes: wide
 header:
-  teaser: /assets/images/htb-writeup-ssti1/logo_ssti1.png
+  teaser: /assets/images/pctf-writeup-ssti1/logo_ssti1.png
   teaser_home_page: true
   icon: /assets/images/picoCTF.webp
 categories:
   - PicoCTF
   - Pentesting
-  - challenge
-  - web
+  - Challenge
+  - Web
 tags:
   - writeup
   - challenge
