@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Trickster - PicoCTF
-excerpt: "En este challenge dispondremos de una simple página web con una posible subida de archivos de solamente formato .png . Que cambiando los primeros bytes del archivo cual contendrá el código malicio será posible su subida, aunque tenga un.php (debe tener el .png antes de este) y asi, coger la bandera mediante una ejecución remota de comandos RCE via webshell ."
+excerpt: "En este challenge dispondremos de una simple página web con una posible subida de archivos de solamente formato .png . Que cambiando los primeros bytes del archivo cual contendrá el código malicio será posible su subida, aunque tenga un.php (debe tener el .png antes de este) y asi, coger la bandera mediante una ejecución remota de comandos RCE via webshell."
 date: 2026-01-18
 classes: wide
 header:
