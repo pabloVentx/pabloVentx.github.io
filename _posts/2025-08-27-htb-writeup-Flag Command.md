@@ -9,7 +9,7 @@ header:
   teaser_home_page: true
   icon: /assets/images/hackthebox.webp
 categories:
-  - PicoCTF
+  - Hackthebox
   - Pentesting
   - Challenge
   - Web

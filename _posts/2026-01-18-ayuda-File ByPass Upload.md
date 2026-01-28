@@ -29,6 +29,7 @@ Por ejemplo, nombrar un archivo como `shell.php%00.jpg` puede hacer que la valid
 >Está técnica se puede usar para diferentes ataques. Como *PATH TRAVERSAL* o *LFI*
 
 
+
 ##### 2 FORMA: validación de formato en la cadena del nombre
 
 Interpreta que al comprobar que en la cadena del nombre contiene `.x` (formato deseado), ya no compruebe lo que tiene después.
@@ -36,16 +37,41 @@ Interpreta que al comprobar que en la cadena del nombre contiene `.x` (formato d
 `shell.jpg.php`
 
 
+
 ##### 3 FORMA: Validación de los primeros bytes o "Magic Numbers"
 
 Usado para identificar el archivo mediante los primeros bytes, aparte del propio formato.
 
 
-**JPG**<span style="color:orange">;</span> (En la primera línea del archivo)
-
-<?php system("whoami"); ?>
+````
+1 JPG; (En la primera línea del archivo)
+2 <?php system("whoami"); ?>
+````
 
 
 >Ej: Challenge "Trickster", se ve este metodo.
 
 >Más información: [List of Signatures](https://en.wikipedia.org/wiki/List_of_file_signatures)
+
+
+
+##### 4 FORMA: En Burp Suite capturar modificar campos del paquete
+
+En Burp Suite, podríamos capturar un paquete y pasarlo por el "Repeater", para modificar campos; **Nombre del archivo, contenido del archivo, cambiar el Content-Type (Tipo de archivo) a diferentes formatos...** Hacer las formas anteriores pero usando dicha herramienta.
+
+
+
+##### 5 FORMA: Archivo que establece políticas/directivas a nivel directorio
+
+<span style="color:green">.htaccess</span> -> Archivo configuración a **nivel directorio**, usado por <span style="color:lime
+">Apache HTTP Server</span>, que permite modificar el comportamiento del servidor sin tocar la configuración global -> (*httpd.conf* o *apache2.conf*). En este archivo podemos insertar directivas/políticas.
+
+
+Ej: Ahora estableceremos una política cual permita que cualquier archivo que coincida con la extensión puesta o palabra, lo interprete como motor *PHP*. | Se subira a la web y después el archivomalicoso.jpg
+
+
+**nano** <span style="color:green">.htaccess</span>: 
+<span style="color:orange">AddType</span>  **application**<span style="color:lightyellow">/x-httpd-php</span>  <span style="color:yellow">.jpg</span>
+
+
+>En el challenge "byp4ss3d", se ve este método.
