@@ -41,6 +41,7 @@ Para configurarla, necesitamos rellenar los siguientes parámetros para la conex
 
 ![](/assets/images/ayuda-burpsuite/15_burp.png)
 
+>En caso de querer configurarlo desde el navegador -> Network Settings -> Manual Proxy -> Http Proxy:127.0.0.1 Port:8080
 
 ##### ¿COMO SE CONFIGURA?
 
@@ -144,6 +145,17 @@ Las palabras a probar del diccionario seleccionado:
 ![](/assets/images/ayuda-burpsuite/2_burp.png)
 
 
-Le damos a "Start attack", y empezara el ataque:
+4) En este apartado podemos pasar la respuesta del error o intento fallido del servidor para qué nos diga con que resultado sale otra cosa distinta:
+
+Le damos a "Add".
+
+![](/assets/images/ayuda-burpsuite/21_burp.png)
+
+Le damos a "Refetch response" y seleccionamos el mensaje, cual extrae automáticamente Burp Suite, en el campo "Extract from regex group".  Así nos dice si nos da un mensaje distinto a dicho mensaje definido a la hora de ejecutar el ataque.
+
+![](/assets/images/ayuda-burpsuite/22_burp.png)
+
+
+5) Le damos a "Start attack", y empezara el ataque:
 
 ![](/assets/images/ayuda-burpsuite/1_burp.png)
