@@ -584,7 +584,7 @@ page=..//..//..//..//etc//passwd
 ![](/assets/images/thm-writeup-gallery/lfi3_gal.png)
 
 
-###### XSS (CROSS SITE-SCRIPTING)
+###### STORED XSS (CROSS SITE-SCRIPTING)
 
 Si nos vamos a las cookies de sesión desde la **DEV TOOLS** vemos que esta en **FALSE**:
 

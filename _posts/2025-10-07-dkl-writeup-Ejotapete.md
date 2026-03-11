@@ -12,13 +12,16 @@ categories:
   - Dockerlabs
   - Pentesting
   - eJPTv2
+  - CMS
 tags:
   - writeup
   - eJPTv2
   - HackingWeb
-  - enumeración
+  - CMS-Drupal
+  - Fuzzing
   - Metasploit
   - ReverseShell
+  - RemoteAccessRCE
   - InformationLekeage
   - EscaladaPrivilegios
   - SUIDexplotation

@@ -16,6 +16,8 @@ tags:
   - FileUpload
 ---
 
+>Aquí un complemento acerca de este tema: [file-upload](https://hackviser.com/tactics/pentesting/web/file-upload)
+
 ##### 1 FORMA: Null Byte
 
 Cuando una web valida la extensión de un archivo para permitir solo ciertos tipos (como `.jpg` o `.png`), puedes intentar usar un **null byte** (`%00`) para evadir esa validación. 
@@ -37,6 +39,26 @@ Interpreta que al comprobar que en la cadena del nombre contiene `.x` (formato d
 `shell.jpg.php`
 
 
+En el formato `.php` podemos validar la subida de estos archivos dandoles alfinar las letras de otros formatos. Ejemplos:
+
+```
+.php3
+.php4
+.php5
+.php6
+.php7
+.php8
+.phtml
+.pht
+.phpt
+.phps
+.phar
+.phfig
+.inc
+
+```
+
+`shell.phar`
 
 ##### 3 FORMA: Validación de los primeros bytes o "Magic Numbers"
 

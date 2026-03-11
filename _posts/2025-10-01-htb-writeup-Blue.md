@@ -111,14 +111,23 @@ En el escaneo nos saldrá **VULNERABLE** que nos informa de una vulnerabilidad d
 
 
 
-#### EXPLORACIÓN SMB
+#### ANÁLISIS SMB: Enumeración de Usuarios y Listar shares como guest
 
-Podríamos intentar el ataque *ENUM USERS RPC TO BRUTE FORCE SHARES* pero no va a ver éxito. En los shares no va a ver nada importante.
+Vamos a probar mediante la herramienta *netexec* listar shares como <span style="color:blue">guest</span> o <span style="color:blue">null sesion</span>.
+Nos deja listar como <span style="color:blue">guest</span> los shares "<span style="color:lightblue">Share</span>" y "<span style="color:lightblue">Users</span>" con permisos de lectura. 
+
+No habrá nada interesante en estos.
+
+Listamos usuarios mediante SMB. A continuación la explicación.
 
 ![](/assets/images/htb-writeup-blue/sharesArpc_blue.png)
 
+Podríamos intentar el ataque *ENUM USERS RPC TO BRUTE FORCE SHARES* pero no va a ver éxito.
+Haremos fuerza bruta para ver si podemos adivinar la contraseña con la lista de usuarios hecha anteriormente por el protocolo smb para ver si nos válida algun usuario en otro share cual no haya salido por falta de permisos.
+
 ![](/assets/images/htb-writeup-blue/bruteforce_blue.png)
 
+No tendremos exito. Esta máquina esta diseñada para explotar la vulnerabilidad dedicada en esta máquina.
 
 #### CONFIGURACIÓN EXPLOIT ETERNALBLUE
 
