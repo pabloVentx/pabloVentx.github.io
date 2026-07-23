@@ -19,32 +19,36 @@ tags:
 
 ![](/assets/images/thm-writeup-lofi/logo_lof.png)
 
-"En esta máquina sencilla aprendemos a como funciona la vulnerabilidad *LFI* **(Local File Inclusion)**, para conseguir la bandera."
+
 
 ## WRITE UP
 Ejemplo: 10.66.128.249 (víctima) TTL=63 Linux
 
 
-#### RECONOCIMIENTO
+### RECONOCIMIENTO
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">Lofi</span>
 
 Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
-
->**which** mkt.py | **xargs** **batcat**
-
-*Ver en que ubicación está una herramienta y ver su código*
-*Adelante explicamos a tener batcat, que es un cat pero con esteroides*
 
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
 -Usar el script *whichSystem* que nos dirá directamente el equipo al que estamos atacando, por ende habrá tenido ping para dar la respuesta. Es más silencioso que nmap.
 
+```bash
+whichSystem.py 10.66.128.249
+```
+
 ![](/assets/images/thm-writeup-lofi/which_lof.png)
 
 
--Usar el comando *ping* <span style="color:red">10.66.128.249</span> <span style="color:yellow">-c</span> 1  <span style="color:yellow">-R</span>
+-Usar el comando *ping*:
+
+```bash
+ping -R 10.66.128.249 -c1
+``` 
+
 *-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.*
 
 ![](/assets/images/thm-writeup-lofi/conectividad_lof.png)
@@ -53,7 +57,9 @@ Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:
 Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que puertos tenemos abiertos y que protocolos/servicios tenemos.
 
 
-**nmap** <span style="color:yellow">-p- --open -Pn -vvv -n -sS --min-rate 5000</span> <span style="color:red">10.66.128.249</span> <span style="color:yellow">-oG</span> <span style="color:pink">allPorts</span> 
+```bash
+nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.66.128.249 -oG allPorts
+``` 
 *Veremos porque el formato grepeable, es importante.*
 
 ![](/assets/images/thm-writeup-lofi/nmap1_lof.png)
@@ -62,10 +68,16 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 Una vez hecho, usaremos otra herramienta de s4vitar *extractports* al archivo allPorts
 cual nos copiara los puertos, y escanearlos con nmap. 
 
+```bash
+extractports.sh allPorts
+```
+
 ![](/assets/images/thm-writeup-lofi/extractp_lof.png)
 
 
-**nmap** <span style="color:yellow">-sVC</span>  <span style="color:red">10.66.128.249</span> <span style="color:yellow">-oN</span> <span style="color:pink">targeted</span> 
+```bash
+nmap -sVC -p22,80,8080 10.66.128.249 -oN targeted
+```
 *Este formato lo emplearemos con batcar lenguaje java para verlo mejor*
 
 ![](/assets/images/thm-writeup-lofi/nmap2_lof.png)
@@ -74,15 +86,21 @@ cual nos copiara los puertos, y escanearlos con nmap.
 Una vez escaneado, usaremos batcat:
 >https://github.com/sharkdp/bat.git
 
-**batcat** <span style="color:pink">targeted</span> <span style="color:yellow">-l</span> <span style="color:orange">java</span>
+```bash
+batcat targeted -l java
+```
 *nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/thm-writeup-lofi/batcat_lof.png)
 
 
-#### ANÁLISIS WEB: Lo-Fi Music
+### ANÁLISIS WEB: Lo-Fi Music
 
 Como vemos un *whatweb*, vamos a probar hacer un pequeño reconocimiento a nivel web. Nos muestra la arquitectura y demás, o podemos usar la extensión **wappalyzer**, lo mismo pero por gráfico.
+
+```bash
+whatweb http://10.66.128.249/
+```
 
 ![](/assets/images/thm-writeup-lofi/whatweb_lof.png)
 
@@ -99,11 +117,13 @@ Si le pinchamos a uno vemos que la URL se ve así -> http://10.66.128.249/?page=
 
 ![](/assets/images/thm-writeup-lofi/pag2_lof.png)
 
-#### EXPLOTACIÓN VULNERABLE: LOCAL FILE INCLUSION
+### VULNERABILIDAD WEB: LOCAL FILE INCLUSION
 
 >cuando la aplicación web no valida correctamente la entrada del usuario, permitiendo a un atacante manipular las rutas de archivos mediante técnicas como "path traversal" (navegación por directorios, ej: `../`).
 
-**page**<span style="color:orange">=</span><span style="color:lightblue">../../../../etc/</span><span style="color:grey">passwd</span>
+```bash
+http://10.66.128.249/?page=../../../../etc/passwd
+```
 
 ![](/assets/images/thm-writeup-lofi/lfi_lof.png)
 
@@ -112,13 +132,17 @@ Si le pinchamos a uno vemos que la URL se ve así -> http://10.66.128.249/?page=
 ![](/assets/images/thm-writeup-lofi/lfimejor_lof.png)
 
 
-Podríamos intentar robar las *claves de ssh* de los usuarios, pero no se puede, aparte de que root es privilegiado.
+Podríamos intentar robar las *claves privadas de ssh* (id_rsa) de los usuarios, pero no se puede, aparte de que root es privilegiado.
 
 ![](/assets/images/thm-writeup-lofi/claves_lof.png)
 
 
-#### BANDERA | RESUELTO
+### BANDERA
 
-Para leer la bandera **../../../../flag.txt** -> mostrándonos el contenido.
+Para leer la bandera:
+
+```bash
+http://10.66.128.249/?page=../../../flag.txt
+```
 
 ![](/assets/images/thm-writeup-lofi/flag_lof.png)
