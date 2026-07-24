@@ -23,32 +23,35 @@ tags:
 
 ![](/assets/images/htb-writeup-lame/logo_lame.png)
 
-"Nos aprovecharemos la <span style="color:yellow">versión de smb 3.0.20</span> cual es vulnerable a **USERNAME MAP SCRIPT: RCE** -> CVE-2007-2447.
-Nos va a permitir ejecutar comandos como <span style="color:blue">root</span> a través de un <span style="color:lightblue">share de smb</span> por una inyección de código malicioso."
+
 
 ## WRITE 
 IP VÍCTIMA: 10.10.10.3 (víctima) TTL=  63 LINUX
 
 
-#### RECONOCIMIENTO
+### RECONOCIMIENTO
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">Lame</span>
 
 Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
 
->**which** mkt.py | **xargs** **batcat** -l python
-
-*Ver en que ubicación está una herramienta y ver su código*
-*Adelante explicamos a tener batcat, que es un cat pero con esteroides*
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
 -Usar el script *whichSystem* que nos dirá directamente el equipo al que estamos atacando, por ende habrá tenido ping para dar la respuesta. Es más silencioso que nmap.
 
+```bash
+whichSystem.py 10.10.10.3
+```
+
 ![](/assets/images/htb-writeup-lame/whichsystem_lame.png)
 
 
--Usar el comando *ping* <span style="color:red">10.10.10.3</span> <span style="color:yellow">-c</span> 1  <span style="color:yellow">-R</span>
+-Usar el comando *ping*: 
+
+```bash
+ping 10.10.10.3 -1 -R
+```
 *-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, al ser Windows no lo muestra.*
 
 ![](/assets/images/htb-writeup-lame/conectividad_lame.png)
@@ -56,8 +59,10 @@ Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:
 
 Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que puertos tenemos abiertos y que protocolos/servicios tenemos.
 
+```bash
+nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.10.10.3 -oG allPorts
+```
 
-**nmap** <span style="color:yellow">-p- --open -Pn -vvv -n -sS --min-rate 5000</span> <span style="color:red">10.10.10.3</span> <span style="color:yellow">-oG</span> <span style="color:pink">allPorts</span>
 *Veremos porque el formato grepeable, es importante.*
 
 ![](/assets/images/htb-writeup-lame/nmap1_lame.png)
@@ -66,10 +71,17 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 Una vez hecho, usaremos otra herramienta de s4vitar *extractports* al archivo allPorts
 cual nos copiara los puertos, y escanearlos con nmap. 
 
+```bash
+extractports.sh allPorts
+```
+
 ![](/assets/images/htb-writeup-lame/extractports_lame.png)
 
 
-**nmap** <span style="color:yellow">-sVC</span> <span style="color:yellow">-p</span><span style="color:purple">21,22,139,445,3632</span> <span style="color:red">10.10.10.3</span> <span style="color:yellow">-oN</span> <span style="color:pink">targeted</span> 
+```bash
+nmap -sVC -p21,22,139,445,3632 10.10.10.3 -oN targeted
+```
+
 *Este formato lo emplearemos con batcat lenguaje java para verlo mejor*
 
 ![](/assets/images/htb-writeup-lame/nmap2_lame.png)
@@ -78,13 +90,16 @@ cual nos copiara los puertos, y escanearlos con nmap.
 Una vez escaneado, usaremos batcat:
 >https://github.com/sharkdp/bat.git
 
-**batcat** <span style="color:pink">target</span> <span style="color:yellow">-l</span> <span style="color:orange">java</span>
+```bash
+batcat targeted -l java
+```
+
 *nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/htb-writeup-lame/batcat_lame.png)
 
 
-#### ANÁLISIS FTP: RECONOCIMIENTO
+### ANÁLISIS FTP: RECONOCIMIENTO
 
 En el escaneo de nmap vemos que nos ha sacado que hay un login. con <span style="color:blue">anonymous</span>.
 
