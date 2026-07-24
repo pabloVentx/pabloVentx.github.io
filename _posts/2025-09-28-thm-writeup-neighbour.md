@@ -20,32 +20,36 @@ tags:
 
 ![](/assets/images/thm-writeup-neighbour/logo_neigh.png)
 
-"En esta máquina tendremos un login, cual no dispondremos de ninguna credencial. En el código fuente de la página habra unas credenciales de invitado, accediendo. Miraremos el código fuente nuevamente, donde nos dira que el admin puede ser vulnerable, y en la URL tendremos =guest, acontenciendo la vulnerabilidad IDOR (Insecure Direct Object Reference) cambiando en el parámetro de la URL el usuario para convertirnos en otro usuario."
+
 
 ## WRITE UP
 IP VÍCITMA-> 10.10.208.50 (TTL 63) LINUX
 
 
-#### RECONOCIMIENTO
+### RECONOCIMIENTO
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">neighbour</span>
 
 Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
-
->**which** mkt.py | **xargs** **batcat** -l python
-
-*Ver en que ubicación está una herramienta y ver su código*
-*Adelante explicamos a tener batcat, que es un cat pero con esteroides*
 
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
 -Usar el script *whichSystem* que nos dirá directamente el equipo al que estamos atacando, por ende habrá tenido ping para dar la respuesta. Es más silencioso que nmap.
 
+```bash
+whichSystem.py 10.10.208.50
+```
+
 ![](/assets/images/thm-writeup-neighbour/which_neigh.png)
 
 
--Usar el comando *ping* <span style="color:red">10.10.208.50</span> <span style="color:yellow">-c</span> 1  <span style="color:yellow">-R</span>
+-Usar el comando *ping*: 
+
+```bash
+ping 10.10.208.50 -c1 -R
+```
+
 *-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.* 
 
 ![](/assets/images/thm-writeup-neighbour/conectividad_neigh.png)
@@ -53,8 +57,10 @@ Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:
 
 Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que puertos tenemos abiertos y que protocolos/servicios tenemos.
 
+```bash
+nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.10.208.50 -oG allPorts
+```
 
-**nmap** <span style="color:yellow">-p- --open -Pn -vvv -n -sS --min-rate 5000</span> <span style="color:red">10.10.208.50</span> <span style="color:yellow">-oG</span> <span style="color:pink">allPorts</span>
 *Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/thm-writeup-neighbour/nmap1_neigh.png)
@@ -63,12 +69,18 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 Una vez hecho, usaremos otra herramienta de s4vitar *extractports* al archivo allPorts
 cual nos copiara los puertos, y escanearlos con nmap. 
 
+```bash
+extractports.sh allPorts
+```
+
 ![](/assets/images/thm-writeup-neighbour/extractpor_neigh.png)
 
+```bash
+nmap -sVC -p22,80 10.10.208.50 -oN targeted
+```
 
-**nmap** <span style="color:yellow">-sVC</span>  <span style="color:yellow">-p</span><span style="color:purple">22,80</span> <span style="color:red">10.10.208.50</span> <span style="color:yellow">-oN</span> <span style="color:pink">targeted</span> 
-*Este formato lo emplearemos con batcat lenguaje java para verlo mejor*
 *Nos mostrará la versión de los servicios que están corriendo*
+
 *Usará scripts defaults*
 
 ![](/assets/images/thm-writeup-neighbour/nmap2_neigh.png)
@@ -77,18 +89,23 @@ cual nos copiara los puertos, y escanearlos con nmap.
 Una vez escaneado, usaremos batcat:
 >https://github.com/sharkdp/bat.git
 
-**batcat** <span style="color:pink">target</span> <span style="color:yellow">-l</span> <span style="color:orange">java</span>
+```bash
+batcat targeted -l java
+```
+
 *nos mostrara la salida en un formato más bonito, con java
 
 ![](/assets/images/thm-writeup-neighbour/batcat_neigh.png)
 
 
-#### ANÁLISIS WEB: RECONOCIMIENTO
+### ANÁLISIS WEB: RECONOCIMIENTO
 
 Haremos un pequeño análisis a nivel web con *whatweb*.
 Nos dirá que hay un formulario y una cookie de sesión.
 
-**whatweb** http://10.10.208.50/
+```bash
+whatweb http://10.10.208.50/
+```
 
 ![](/assets/images/thm-writeup-neighbour/whatweb_neigh.png)
 
@@ -116,9 +133,9 @@ Dice que la cuenta admin puede ser vulnerable.
 ![](/assets/images/thm-writeup-neighbour/admin_neigh.png)
 
 
-#### VULNERABILIDAD IDOR (Insecure Direct Object Reference)
+### VULNERABILIDAD IDOR (Insecure Direct Object Reference)
 
-Vemos en la URL el nombre <span style="color:orange">=</span><span style="color:blue">guest</span>, pues lo cambiamos a <span style="color:orange">=</span><span style="color:blue">admin</span>.
+Vemos en la URL el nombre del usuario <span style="color:orange">=</span><span style="color:blue">guest</span>, pues lo cambiamos a <span style="color:orange">=</span><span style="color:blue">admin</span>.
 Nos convertiremos en el, obteniendo la bandera.
 
 > cuando una aplicación web permite acceder directamente a objetos internos (IDs, archivos, registros) sin verificar correctamente la autorización del usuario. Esto permite que un atacante manipule parámetros y acceda a datos o recursos de otros usuarios.
