@@ -25,7 +25,7 @@ tags:
 
 
 
-## WRITE 
+## WRITE UP
 IP VÍCTIMA: 10.10.10.3 (víctima) TTL=  63 LINUX
 
 
