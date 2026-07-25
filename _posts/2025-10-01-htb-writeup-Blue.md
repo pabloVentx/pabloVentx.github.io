@@ -101,7 +101,7 @@ Una vez escaneado, usaremos batcat:
 batcat targeted -l java
 ```
 
-*nos mostrara la salida en un formato más bonito, con java
+*nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/htb-writeup-blue/batcat_blue.png)
 
