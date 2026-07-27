@@ -60,9 +60,8 @@ whichSystem.py 172.17.0.2
 
 ```bash
 ping 172.17.0.2 -c1 -R
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.* 
 ```
-
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.* 
 
 ![](/assets/images/dkl-writeup-dancesamba/conectividad_dancesamba.png)
 
@@ -71,8 +70,8 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 
 ```bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 172.17.0.2 -oG allPorts
+# Veremos porque el formato grapeable, es importante.
 ```
-*Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/dkl-writeup-dancesamba/nmap1_dancesamba.png)
 
@@ -88,11 +87,10 @@ extractports.sh allPorts
 
 ```bash
 nmap -sVC -p21,22,139,445 172.17.0.2 -oN targeted
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
 ``` 
-
-*Nos mostrará la versión de los servicios que están corriendo*
-
-*Usará scripts defaults*
 
 ![](/assets/images/dkl-writeup-dancesamba/nmap2_dancesamba.png)
 
@@ -102,9 +100,8 @@ Una vez escaneado, usaremos batcat:
 
 ```bash
 batcat targeted -l java
+# Nos mostrara la salida en un formato más bonito, con java
 ```
-
-*nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/dkl-writeup-dancesamba/batcat_dancesamba.png)
 

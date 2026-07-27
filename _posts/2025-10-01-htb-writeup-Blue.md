@@ -54,10 +54,8 @@ whichSystem.py 10.10.10.40
 
 ```bash
 ping -c1 10.10.10.40 -R
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, al ser windows no muestra el prceso* 
 ```
-
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, al ser windows no muestra el prceso* 
-
 
 
 ![](/assets/images/htb-writeup-blue/conectividad_blue.png)
@@ -68,9 +66,8 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 
 ```bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.10.10.40 -oG allPorts
+# Veremos porque el formato grapeable, es importante.
 ```
-
-*Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/htb-writeup-blue/nmap1_blue.png)
 
@@ -86,10 +83,10 @@ extractports.sh allPorts
 
 ```bash
 nmap -sVC -p135,139,445,49152,49153,49154,49155,49156,49157 10.10.10.40 -oN targeted
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
 ```
-
-*Nos mostrará la versión de los servicios que están corriendo*
-*Usará scripts defaults*
 
 ![](/assets/images/htb-writeup-blue/nmap2_blue.png)
 
@@ -99,9 +96,8 @@ Una vez escaneado, usaremos batcat:
 
 ```bash
 batcat targeted -l java
+# Nos mostrara la salida en un formato más bonito, con java
 ```
-
-*nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/htb-writeup-blue/batcat_blue.png)
 

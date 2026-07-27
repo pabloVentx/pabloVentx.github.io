@@ -48,9 +48,8 @@ whichSystem.py 10.10.208.50
 
 ```bash
 ping 10.10.208.50 -c1 -R
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.
 ```
-
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.* 
 
 ![](/assets/images/thm-writeup-neighbour/conectividad_neigh.png)
 
@@ -59,9 +58,8 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 
 ```bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.10.208.50 -oG allPorts
+# Veremos porque el formato grapeable, es importante.
 ```
-
-*Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/thm-writeup-neighbour/nmap1_neigh.png)
 
@@ -77,11 +75,10 @@ extractports.sh allPorts
 
 ```bash
 nmap -sVC -p22,80 10.10.208.50 -oN targeted
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
 ```
-
-*Nos mostrará la versión de los servicios que están corriendo*
-
-*Usará scripts defaults*
 
 ![](/assets/images/thm-writeup-neighbour/nmap2_neigh.png)
 
@@ -91,9 +88,8 @@ Una vez escaneado, usaremos batcat:
 
 ```bash
 batcat targeted -l java
+# Nos mostrara la salida en un formato más bonito, con java
 ```
-
-*nos mostrara la salida en un formato más bonito, con java
 
 ![](/assets/images/thm-writeup-neighbour/batcat_neigh.png)
 

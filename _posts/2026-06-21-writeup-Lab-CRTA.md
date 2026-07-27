@@ -493,7 +493,7 @@ nmap -p- --open --min-rate 5000 -Pn -n -vvv -iL ips_interna.txt -oN internal_tcp
 
 >Metodología en esta cert. -> solo el primer escaneo suficiente.
 
->No hace falta puerto por separado, ya que perderíamos tiempo y realmente no es relevante.
+>No hace falta diferente IP objetivo por separado, ya que perderíamos tiempo y realmente no es relevante.
 
 ![](/assets/images/cwl-writeup-crta/Pasted image 20260622004933.png)
 
@@ -521,7 +521,7 @@ De primeras vemos la siguiente información:
 
 192.168.98.30 -> MGMT -> Credenciales Válidas con privilegios -> <span style="color:gold">(Pwn3d!)</span>
 
-![](/assets/images/cwl-writeup-crta/Pasted image 20260622005956.png]]
+![](/assets/images/cwl-writeup-crta/Pasted image 20260622005956.png)
 
 ### ENUMERACIÓN USUARIOS DOMINIO
 Seguidamente vamos a hacer una enumeración de usuarios para tener en mente por donde tirar.

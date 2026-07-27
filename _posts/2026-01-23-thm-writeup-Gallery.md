@@ -59,9 +59,8 @@ whichSystem.py 10.67.170.17
 
 ```bash
 ping 10.67.170.17 -c1 -R
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición*
 ```
-
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición*
 
 ![](/assets/images/thm-writeup-gallery/conectividad_gal.png)
 
@@ -71,9 +70,8 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 
 ```bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.67.170.17 -oG allPorts
+Veremos porque el formato grapeable, es importante.
 ```
-
-*Veremos porque el formato grapeable, es importante.*
 
 ![](/assets/images/thm-writeup-gallery/nmap1_gal.png)
 
@@ -90,11 +88,10 @@ extractports.sh allPorts
 
  ```bash
 nmap -sVC -p22,80,8080 10.67.170.17 -oN targeted
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
 ```
-
-*Este formato lo emplearemos con batcat lenguaje java para verlo mejor*
-*Nos mostrará la versión de los servicios que están corriendo*
-*Usará scripts defaults*
 
 ![](/assets/images/thm-writeup-gallery/nmap2_gal.png)
 

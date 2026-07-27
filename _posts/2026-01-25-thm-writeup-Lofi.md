@@ -47,9 +47,8 @@ whichSystem.py 10.66.128.249
 
 ```bash
 ping -R 10.66.128.249 -c1
-``` 
-
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.*
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, nos muestra el proceso.*
+```
 
 ![](/assets/images/thm-writeup-lofi/conectividad_lof.png)
 
@@ -59,8 +58,8 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 
 ```bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.66.128.249 -oG allPorts
-``` 
-*Veremos porque el formato grepeable, es importante.*
+# Veremos porque el formato grepeable, es importante.
+```
 
 ![](/assets/images/thm-writeup-lofi/nmap1_lof.png)
 
@@ -77,8 +76,12 @@ extractports.sh allPorts
 
 ```bash
 nmap -sVC -p22,80,8080 10.66.128.249 -oN targeted
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
 ```
-*Este formato lo emplearemos con batcar lenguaje java para verlo mejor*
+
+
 
 ![](/assets/images/thm-writeup-lofi/nmap2_lof.png)
 
@@ -88,8 +91,8 @@ Una vez escaneado, usaremos batcat:
 
 ```bash
 batcat targeted -l java
+# Nos mostrara la salida en un formato más bonito, con java
 ```
-*nos mostrara la salida en un formato más bonito, con java*
 
 ![](/assets/images/thm-writeup-lofi/batcat_lof.png)
 

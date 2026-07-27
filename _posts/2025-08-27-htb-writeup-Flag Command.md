@@ -28,7 +28,7 @@ tags:
 docker host: 94.237.61.242:35563
 
 
-#### ANÁLISIS WEB: RECONOCIMIENTO
+### ANÁLISIS WEB: RECONOCIMIENTO
 
 Iniciamos la instancia del reto:
 
@@ -46,7 +46,7 @@ Si ponemos "**start**", vemos que nos salen 4 opciones y hay que elegir una, per
 ![](/assets/images/htb-writeup-flagcommand/opt2_fc.png)
 
 
-#### ANÁLISIS DEV TOOLS:  NETWORK Y TOMAR BANDERA
+### ANÁLISIS DEV TOOLS:  NETWORK Y TOMAR BANDERA
 
 Vamos a probar ver las solicitudes en la red que recibe la página mientras que la página funciona.
 Apretamos en el teclado "**Ctrl + shift + i**"  > "Network" y refrescamos la página.
