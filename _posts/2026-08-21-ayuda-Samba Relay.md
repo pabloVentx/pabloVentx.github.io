@@ -304,7 +304,7 @@ Me vengo al **APP-SERVER** cual no tiene privilegios sobre ningún equipo y busc
 ![](/assets/images/ayuda-sambarelay/Pasted image 20260814145848.png)
 
 
-Vuelvo al ntlmrelayx y en la salida pone *SUCCED* y que no no tiene privilegios *FALSE*, esto no nos va a servir para poder hacer nada.
+Vuelvo al ntlmrelayx y en la salida pone *SUCCED* y que no tiene privilegios *FALSE*, esto no nos va a servir para poder hacer nada.
 
 ![](/assets/images/ayuda-sambarelay/Pasted image 20260814145824.png)
 

@@ -275,7 +275,7 @@ Nos dice que ha capturado 51 paquetes.
 Miramos el tráfico de la captura:
 
 ```bash
-shark -r trafico.cap 2>/dev/null
+tshark -r trafico.cap 2>/dev/null
 ```
 
 ![](/assets/images/htb-writeup-shocker/leerpaq_shocker.png)
