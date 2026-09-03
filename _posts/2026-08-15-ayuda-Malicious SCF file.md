@@ -2,7 +2,7 @@
 layout: single
 title: Ataque Malicious SCF file
 excerpt: "En este Post, enseñare a realizar el ataque SCF file, explicando en que consiste el ataque, y como lo podemos replicar. Todo desde mi laboratorio personal de prácticas de Active Directory ofensivo."
-date: 2026-08-14
+date: 2026-08-15
 classes: wide
 header:
   teaser: /assets/images/htb-writeup-shocker/
