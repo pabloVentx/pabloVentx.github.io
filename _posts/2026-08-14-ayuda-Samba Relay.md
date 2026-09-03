@@ -1,8 +1,8 @@
 ---
 layout: single
 title: Ataque Samba Relay - IPv4 e IPv6
-excerpt: "En este Post, enseñare a realizar el ataque de Samba Relay por IPv4 e IPv6, explicando en que consiste el ataque y las diferentes herramientas que se emplean. Todo desde mi laboratorio personal de prácticas de Active Directory ofensivo."
-date: 2026-08-21
+excerpt: "En este Post, enseñare a realizar el ataque de Samba Relay por IPv4 e IPv6, explicando en que consiste el ataque, las diferentes herramientas que se emplean, y a su vez como replicarlo. Todo desde mi laboratorio personal de prácticas de Active Directory ofensivo."
+date: 2026-08-14
 classes: wide
 header:
   teaser: /assets/images/htb-writeup-shocker/
@@ -14,6 +14,7 @@ categories:
   - Pentesting
 tags:
   - SambaRelay
+  - Poisoning
   - SOCKS-Proxy
   - SMB-Signing
   - DumpHashes
