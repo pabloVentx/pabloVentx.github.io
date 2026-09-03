@@ -19,7 +19,7 @@ tags:
   - crack-hashes
 ---
 
-Esta técnica se basa en que estos tipos de archivos, exactamente el icono del archivo a nivel de visualización, al ser cargado en el explorador de archivos lo podemos envenenar.
+Esta técnica se basa en que estos tipos de archivos, exactamente el icono del archivo a nivel de visualización, al ser cargado en el explorador de archivos lo podemos envenenar y capturar el hash NTLMv2 de quien lo visualice.
 
 > [Referencia del ataque SMB SCF](https://pentestlab.blog/2017/12/13/smb-share-scf-file-attacks/)
 
