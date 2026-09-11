@@ -36,7 +36,7 @@ IP VÍCITMA->  10.128.138.75  (TTL 62) LINUX
 
 Lo primero que vamos hacer es crear nuestro entorno de trabajo: <span style="color:lightblue">Gallery</span>
 
-Dentro usaremos la herramienta de s4vitar *mk* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
+Dentro usaremos la herramienta de s4vitar *mkt* cual nos generara las carpetas necesarias para tener todo más organizado; **Nmap...**
 
 Para empezar el reconocimiento, enviamos una traza ICMP a la <span style="color:red">IP</span> de la maquina víctima, para comprobar que tenemos conectividad, tenemos dos alternativas:
 
@@ -52,7 +52,7 @@ whichSystem 10.128.138.75
 -Usar el comando *ping*:
 ```bash
 ping -R 10.128.138.75 -c1
-# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición*
+# -R Lo que hace es un record route que consiste que a la hora de hacer la petición se lo envía a un nodo intermediario para que no sea directa la petición.
 ```
 
 ![](/assets/images/thm-writeup-archangel/2_arch.png)
