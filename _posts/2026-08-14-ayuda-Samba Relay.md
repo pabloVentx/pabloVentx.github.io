@@ -335,7 +335,7 @@ Ahora nos aseguramos de que en el archivo de configuración de Proxychains, tene
 
 Como tenemos un Relaying de un usuario Administrador sobre dicho target, podemos tirar de proxychains para tunelizar y redirigirlo hacia nosotros y hacer uso de netexec para autenticarnos sobre dicho equipo y nos va a poner <span style="color:yellow">(Pwn3d!)</span>, sin conocer la contraseña poniendo la que queramos.
 
-><span style="color:yellow">(Guest)</span> nose porque sale.
+><span style="color:yellow">(Guest)</span> sale porque al ser una contraseña inventada lo detecta como si fuera una autenticación como invitado.
 
 ```bash
 proxychains -u 'pmartinez' -p 'loquequiera' -d 'cyberwarfare'
